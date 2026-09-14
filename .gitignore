@@ -1,0 +1,26 @@
+# ===== Processing 构建产物 =====
+build/
+out/
+out*/
+application.*/
+*.class
+*.exe
+
+# ===== Processing 临时文件 =====
+*.autosave
+
+# ===== IDE编辑器配置 =====
+.vscode/
+.idea/
+*.iml
+
+# ===== 系统垃圾文件 =====
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# ===== 日志文件 =====
+*.log
+
+# ⚠️ 不要写 *.jar！
+# Arknights/code/controlP5.jar 是项目依赖，需要提交入库
