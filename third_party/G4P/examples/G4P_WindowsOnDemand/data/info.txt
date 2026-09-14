@@ -1,0 +1,1 @@
+This sketch demonstrates a new closing option for GWindow controls - HIDE_WINDOW. Effectively if you attempt to close this window using the standard close icons (e.g. red cross) it will make the window invisible rather than close it. This will be useful if you want to close / open the window several times when your application is running.
