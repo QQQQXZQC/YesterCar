@@ -21,6 +21,3 @@ Desktop.ini
 
 # ===== 日志文件 =====
 *.log
-
-# ⚠️ 不要写 *.jar！
-# Arknights/code/controlP5.jar 是项目依赖，需要提交入库

@@ -2,22 +2,23 @@
 
 本目录存放本项目的 **UI 组件库依赖**：G4P 4.3.11（官方完整发布包）。
 
-## 为什么用它
+## 它提供什么
 
-课程方案 §2.13 原定使用 ControlP5，V1.4 修订后更换为 G4P。选型依据（均为本机 Processing 4.5.6 环境实测）：
+G4P 是本项目选用的 UI 组件库。本项目实际用到的能力：
 
-| 对比项 | ControlP5 2.2.6 | G4P 4.3.11 |
+| 能力 | 对应 API | 本项目用途 |
 | --- | --- | --- |
-| 发布年份 / 维护状态 | 2015 年，已停止更新 | 持续更新，4.3.11 为当前版本 |
-| Processing 4 兼容性 | 源码编译报 6 处错误，须打补丁 | **零修改直接可用** |
-| 多窗口支持 | 需手工包装，第二窗口行为未经验证 | **`GWindow` 原生支持** |
-| 数值输入 | 无专用控件 | **`GSpinner` 数值微调** |
-| 全局配色 | 需逐控件 `setColor()` | **`GCScheme` 全局配色方案** |
-| 中文字体 | 需逐窗口 `setFont()` | `G4P.setDisplayFont/setInputFont/setSliderFont` |
-| 依赖获取 | 官方渠道不可达，需从源码编译 + 打补丁 | 官方完整发布包 |
+| 多窗口 | `GWindow.getWindow()` | 四个模块各占一个窗口（方案 §1.4） |
+| 数值输入 | `GSpinner` | 关卡参数、波次时间、出怪数量与间隔 |
+| 下拉选择 | `GDropList` | 敌人类型、红门 / 目标蓝门 |
+| 按钮 | `GButton` + `GToggleGroup` | 工具栏、地形选择（单选）、保存 / 加载 |
+| 标签 | `GLabel` | 文件名、状态栏 |
+| 面板 | `GPanel` | 波次列表容器，可折叠 |
+| 全局配色 | `GCScheme` + `G4P.setGlobalColorScheme()` | 由 `UITheme` 统一封装 |
+| 中文字体 | `G4P.setDisplayFont/setInputFont/setSliderFont` | 全局注入微软雅黑 |
+| 文件对话框 | `G4P.selectInput/selectOutput` | 地图与关卡 JSON 的打开 / 保存 |
 
-关键的一条：**ControlP5 在 Processing 4 下 `PApplet.frame` 已被移除**，`ControlWindow.java` 有 6 处编译错误；
-而 G4P 虽然同样使用 AWT（`java.awt.Frame`、`java.awt.FileDialog`），但取其窗口引用的方式不受该变更影响，**开箱即用**。
+G4P 4.3.11 直接兼容 Processing 4.5.6，**无需任何修改**。
 
 ## 目录内容
 
