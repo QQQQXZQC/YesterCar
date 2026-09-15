@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.yestercar</groupId>
+    <artifactId>YesterCar</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>YesterCar</name>
+    <description>明日方舟式关卡设计器与基础战斗 —— Maven 标准 Java 工程 + Processing 渲染层</description>
+
+    <properties>
+        <maven.compiler.release>17</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <processing.version>4.5.6</processing.version>
+        <g4p.version>4.3.11</g4p.version>
+        <junit.version>5.10.2</junit.version>
+
+        <main.class>com.yestercar.Main</main.class>
+    </properties>
+
+    <!--
+      G4P 不在 Maven 中央仓库（官方仅走 SourceForge，本机网络不可达），
+      因此把它装进「项目内本地仓库」.mvn/repo（布局 = ~/.m2/repository 的布局）。
+
+      为什么不用 <repositories> 声明 file:// 仓库：
+      本机 ~/.m2/settings.xml 里配置了 <mirrorOf>*</mirrorOf> 的阿里云镜像，
+      它会连 file:// 的项目内仓库一起劫持，导致 org.g4p:g4p 永远解析失败（已实测）。
+      改用本地仓库布局后，Maven 不会对已存在的构件发起远程请求，镜像配置无法干扰。
+
+      .mvn/repo 的路径由 .mvn/maven.config 固定；G4P 由 tools/install-g4p.cmd 装入。
+      详见 docs/开发交接文档.md 第三节。
+    -->
+    <dependencies>
+        <!-- Processing 渲染层：以普通库形式引入，JAVA2D 渲染器不需要 JOGL 原生库 -->
+        <dependency>
+            <groupId>org.processing</groupId>
+            <artifactId>core</artifactId>
+            <version>${processing.version}</version>
+        </dependency>
+
+        <!-- UI 控件库：来自项目内本地仓库 .mvn/repo（见上方说明） -->
+        <dependency>
+            <groupId>org.g4p</groupId>
+            <artifactId>g4p</artifactId>
+            <version>${g4p.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>YesterCar</finalName>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+                <configuration>
+                    <release>17</release>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
+                <configuration>
+                    <!-- 测试与主程序共用 UTF-8，避免中文用例名乱码 -->
+                    <argLine>-Dfile.encoding=UTF-8</argLine>
+                </configuration>
+            </plugin>
+
+            <!-- 打可执行 fat-jar，供 jpackage 打包成含内嵌 JRE 的独立应用 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.5.3</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <transformers>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>${main.class}</mainClass>
+                                </transformer>
+                            </transformers>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                        <exclude>module-info.class</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- mvn exec:java —— 在 IDE 之外直接跑主窗口，便于快速验证 -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <mainClass>${main.class}</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
