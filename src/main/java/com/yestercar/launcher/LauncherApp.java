@@ -12,8 +12,8 @@ import processing.core.PConstants;
  * 主窗口：主菜单、选关、编队、干员选择的宿主。
  *
  * <p>本类目前是<strong>占位骨架</strong>：三个模块按钮只打印日志，尚未打开子窗口。
- * 窗口机制（{@code PApplet.runSketch} 与 G4P {@code GWindow}）的对比实验见
- * {@code docs/第一阶段规划.md} 第九节，结论确定后再回填这里。
+ * 窗口机制已定型为方案 A（{@code PApplet.runSketch}），详见
+ * {@code docs/具体设计.md} §2.6；「关闭 = 隐藏 + 状态保留」的注册表实现见第 6.2 节 P3.2。
  *
  * <p>按策划方案 §10.1.4，本类只保留入口方法并把事件转发给控制器；
  * 后续应拆出 {@code launcher.controller.SceneRouter} 与

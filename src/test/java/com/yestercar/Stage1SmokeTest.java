@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * 骨架自检：验证「工程能构建、资源能读、坐标换算正确、可写目录能建」。
  *
  * <p>这些是纯逻辑验证，因此用 JUnit 而不是界面上的自检按钮——可重复执行、可在 CI 跑。
- * 窗口相关的验证本质上是 GUI，只能靠人工，见 {@code docs/第一阶段规划.md} 第四节。
+ * 窗口相关的验证本质上是 GUI，只能靠人工，见 {@code docs/具体设计.md} 第七部分。
  */
 @DisplayName("骨架自检")
 class Stage1SmokeTest {
@@ -226,7 +226,7 @@ class Stage1SmokeTest {
     }
 
     // ------------------------------------------------------------------
-    // 素材契约（美术侧与代码侧的接口，见 docs/素材接口说明.md）
+    // 素材契约（美术侧与代码侧的接口，见 docs/具体设计.md 第五部分）
     // ------------------------------------------------------------------
 
     @Test
@@ -277,7 +277,7 @@ class Stage1SmokeTest {
     /**
      * 坐标换算的本地期望值。
      *
-     * <p>{@code common.util.GridMath} 属于第二阶段交付物（见第一阶段规划 §七），
+     * <p>{@code common.util.GridMath} 尚未实现（见 {@code docs/具体设计.md} 第 6.2 节 P1），
      * 本阶段先用内联算式锁定契约，避免测试依赖尚未存在的类。
      */
     private static final class GridMathProbe {

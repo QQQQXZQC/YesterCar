@@ -10,7 +10,7 @@
 ## 快速开始（新队友两步）
 
 ```powershell
-tools\install-g4p.cmd     # 首次：把 G4P 装入项目内本地仓库（只需一次）
+tools\install-g4p.cmd     # 首次：装 G4P（只需一次）
 tools\build.cmd           # 构建 + 跑测试
 ```
 
@@ -25,6 +25,14 @@ java -jar target\YesterCar.jar --check  # 无窗口环境自检，排查问题�
 ```
 
 或在 IDEA 里直接运行 `com.yestercar.Main`。
+
+### 在 IDEA 里报「程序包 g4p_controls 不存在」？
+
+说明 `tools\install-g4p.cmd` 没跑过。G4P 不在任何 Maven 仓库上，必须从仓库自带的
+jar 装入本地仓库。这个脚本会同时装入**项目内仓库**（命令行用）和**全局 `~/.m2`**
+（IDEA 默认用），装完在 IDEA 里执行 **Maven 工具窗口 → Reload All Maven Projects**。
+
+详见 `docs/具体设计.md` §1.5-③。
 
 ---
 
@@ -50,7 +58,7 @@ YesterCar/
   .mvn/repo/                 项目内本地仓库（gitignore，脚本可重建）
   tools/                     构建脚本
   third_party/G4P/           G4P 4.3.11 官方完整包（必须入库）
-  docs/                      策划方案 / 交接文档 / 阶段规划 / 素材接口说明
+  docs/                      策划方案.md + 具体设计.md（只有这两份）
   src/main/java/com/yestercar/
     Main.java                入口 + --check 自检
     splash/                  启动动画
@@ -78,19 +86,19 @@ YesterCar/
 第一阶段「可编译可运行的空骨架」已完成：`mvn clean test` 10 个用例全绿，
 启动动画 → 主菜单链路实测通过，fat-jar 可独立运行。
 
-尚未实现：模块窗口互相唤起、`jpackage` 打 exe、以及全部游戏业务规则。
-详见 `docs/第一阶段规划.md` 第十节。
+下一步按 `docs/具体设计.md` 第 6.2 节的路线图推进：
+**P0**（双入口 + jar 目录风险验证）→ **P1**（编辑器与运行时各自起手，两人并行）。
+
+尚未实现：双入口、战役结构、窗口互相唤起、全部游戏业务规则、`jpackage` 打 exe。
 
 ---
 
-## 文档
+## 文档（只有两份）
 
 | 文档 | 内容 |
 | --- | --- |
-| `docs/策划方案.md` | 完整策划：规则、数据契约、类设计、包结构、排期 |
-| `docs/开发交接文档.md` | **环境踩坑清单与已实测事实**——动手前先读这份 |
-| `docs/第一阶段规划.md` | 第一阶段的规划与验收记录 |
-| `docs/素材接口说明.md` | 美术/平面素材的目录、尺寸、命名规范 |
+| `docs/策划方案.md` | 游戏规则、数据契约、类职责、数值、排期 |
+| `docs/具体设计.md` | **动手前先读这份**：环境与踩坑、架构与包结构、技术实现要点、素材接口、开发路线图 |
 
 ---
 

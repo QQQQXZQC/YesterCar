@@ -7,7 +7,7 @@ package com.yestercar.common.util;
  * 直接传给 {@link com.yestercar.common.io.Workspace#resourceExists(String)} /
  * {@link com.yestercar.common.io.Workspace#openResource(String)}。
  *
- * <p>命名与尺寸规范见 {@code docs/素材接口说明.md}——改这里之前先改那份文档，
+ * <p>命名与尺寸规范见 {@code docs/具体设计.md} 第五部分——改这里之前先改那份文档，
  * 两边必须一致。
  *
  * <h2>美术规则（策划方案 §2.12）</h2>

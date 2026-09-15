@@ -34,7 +34,7 @@
       改用本地仓库布局后，Maven 不会对已存在的构件发起远程请求，镜像配置无法干扰。
 
       .mvn/repo 的路径由 .mvn/maven.config 固定；G4P 由 tools/install-g4p.cmd 装入。
-      详见 docs/开发交接文档.md 第三节。
+      详见 docs/具体设计.md 第一部分。
     -->
     <dependencies>
         <!-- Processing 渲染层：以普通库形式引入，JAVA2D 渲染器不需要 JOGL 原生库 -->
