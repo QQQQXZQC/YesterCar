@@ -1,0 +1,153 @@
+{
+  "_comment": "敌人攻击范围：结构与 operators.json 的 range 一致。除 caster_elite（与我方狙击一致）外，其余都是仅自身一格。",
+  "ranges": {
+    "originium_slug": {
+      "right": [
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    "soldier": {
+      "right": [
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    "hound_pro": {
+      "right": [
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    "phantom": {
+      "right": [
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    "dual_swordsman": {
+      "right": [
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    "scavenger": {
+      "right": [
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    "berserk_leader": {
+      "right": [
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    "sarkaz_greatsword": {
+      "right": [
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    "heavy_defender": {
+      "right": [
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    "caster_elite": {
+      "right": [
+        [
+          0,
+          -1
+        ],
+        [
+          1,
+          -1
+        ],
+        [
+          2,
+          -1
+        ],
+        [
+          3,
+          -1
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          3,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          3,
+          1
+        ]
+      ]
+    },
+    "crusher": {
+      "right": [
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    "big_bob": {
+      "right": [
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    "patriot": {
+      "right": [
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  }
+}

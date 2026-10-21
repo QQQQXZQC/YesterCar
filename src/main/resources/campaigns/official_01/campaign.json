@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "id": "official_01",
+  "name": "新手训练",
+  "author": "开发者",
+  "description": "教学关，敌人从西侧红门进攻。",
+  "map": "map/official_01.json",
+  "initialCost": 10,
+  "costPerSecond": 1,
+  "obstacleCost": 3,
+  "obstacleHp": 100,
+  "obstacleBlock": 30,
+  "obstacleCount": 9,
+  "obstacleRedeployTime": 5,
+  "waves": [
+    {
+      "time": 0,
+      "spawns": [
+        {
+          "enemy": "soldier",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 5,
+          "interval": 1
+        }
+      ]
+    }
+  ]
+}

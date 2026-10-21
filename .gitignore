@@ -15,6 +15,17 @@ target/
 # ===== 日志 =====
 *.log
 
+# ===== 外部参考资源（体积巨大，绝不入库） =====
+# ArknightsGameResource-main 是明日方舟解包资源，4.6 GB / 2.4 万个文件。
+# 提交它会直接超出 GitHub 的仓库与单文件限制，push 必然失败。
+# 需要时自行下载，只把**用到的那几个文件**拷进 data/ 或 resources/。
+ArknightsGameResource-main/
+# UI 是参考用的前端设计资料（ak-ui），跑不到 Java 工程里，也不必入库
+UI/
+# SpineViewer 是第三方的 .skel 预览工具（.NET 自包含程序，167 MB），
+# 只是拿来核对素材用的，与工程无关
+SpineViewer-*/
+
 ### IntelliJ IDEA ###
 .idea/modules.xml
 .idea/jarRepositories.xml
@@ -51,3 +62,8 @@ build/
 
 ### Processing 临时文件 ###
 *.autosave
+
+# 本地 IDE 检查配置与本地设置（不入库）
+.idea/inspectionProfiles/
+.idea/prettier.xml
+data/settings.properties

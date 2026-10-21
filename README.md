@@ -24,7 +24,7 @@ java -jar target\YesterCar.jar          # 启动动画 → 主菜单
 java -jar target\YesterCar.jar --check  # 无窗口环境自检，排查问题用
 ```
 
-或在 IDEA 里直接运行 `com.yestercar.Main`。
+或在 IDEA 里直接运行 `com.yestercar.GameMain`。
 
 ### 在 IDEA 里报「程序包 g4p_controls 不存在」？
 
@@ -32,7 +32,7 @@ java -jar target\YesterCar.jar --check  # 无窗口环境自检，排查问题�
 jar 装入本地仓库。这个脚本会同时装入**项目内仓库**（命令行用）和**全局 `~/.m2`**
 （IDEA 默认用），装完在 IDEA 里执行 **Maven 工具窗口 → Reload All Maven Projects**。
 
-详见 `docs/具体设计.md` §1.5-③。
+详见 `docs/交接文档-动画与数值.md`。
 
 ---
 
@@ -58,7 +58,7 @@ YesterCar/
   .mvn/repo/                 项目内本地仓库（gitignore，脚本可重建）
   tools/                     构建脚本
   third_party/G4P/           G4P 4.3.11 官方完整包（必须入库）
-  docs/                      策划方案.md + 具体设计.md（只有这两份）
+  docs/                      交接文档-动画与数值.md（其余文档已移出仓库）
   src/main/java/com/yestercar/
     Main.java                入口 + --check 自检
     splash/                  启动动画
@@ -86,7 +86,7 @@ YesterCar/
 第一阶段「可编译可运行的空骨架」已完成：`mvn clean test` 10 个用例全绿，
 启动动画 → 主菜单链路实测通过，fat-jar 可独立运行。
 
-下一步按 `docs/具体设计.md` 第 6.2 节的路线图推进：
+下一步的改造方向见 `docs/交接文档-动画与数值.md`：
 **P0**（双入口 + jar 目录风险验证）→ **P1**（编辑器与运行时各自起手，两人并行）。
 
 尚未实现：双入口、战役结构、窗口互相唤起、全部游戏业务规则、`jpackage` 打 exe。
@@ -97,8 +97,8 @@ YesterCar/
 
 | 文档 | 内容 |
 | --- | --- |
-| `docs/策划方案.md` | 游戏规则、数据契约、类职责、数值、排期 |
-| `docs/具体设计.md` | **动手前先读这份**：环境与踩坑、架构与包结构、技术实现要点、素材接口、开发路线图 |
+| `docs/交接文档-动画与数值.md` | 动画/特效/数值的接入点与约定 |
+| `src/main/java/com/yestercar/` | 源码；战斗引擎在 `runtime/battle/`，渲染在 `runtime/view/` |
 
 ---
 

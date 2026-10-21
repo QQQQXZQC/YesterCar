@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "id": "狭路相逢",
+  "name": "狭路相逢",
+  "author": "开发者",
+  "description": "",
+  "map": "map/狭路相逢.json",
+  "initialCost": 15,
+  "costPerSecond": 3,
+  "obstacleCost": 3,
+  "obstacleHp": 100,
+  "obstacleBlock": 30,
+  "obstacleCount": 9,
+  "obstacleRedeployTime": 5,
+  "life": 5,
+  "waves": [
+    {
+      "time": 15,
+      "spawns": [
+        {
+          "enemy": "hound_pro",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 10,
+          "interval": 1
+        }
+      ]
+    }
+  ]
+}

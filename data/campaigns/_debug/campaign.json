@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "id": "_debug",
+  "name": "_debug",
+  "author": "开发者",
+  "description": "",
+  "map": "map/_debug.json",
+  "initialCost": 15,
+  "costPerSecond": 3,
+  "obstacleCost": 3,
+  "obstacleHp": 100,
+  "obstacleBlock": 30,
+  "obstacleCount": 9,
+  "obstacleRedeployTime": 5,
+  "life": 5,
+  "waves": [
+    {
+      "time": 10,
+      "spawns": [
+        {
+          "enemy": "phantom",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 5,
+          "interval": 2
+        },
+        {
+          "enemy": "hound_pro",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 10,
+          "interval": 1.5
+        }
+      ]
+    },
+    {
+      "time": 25,
+      "spawns": [
+        {
+          "enemy": "originium_slug",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 10,
+          "interval": 1
+        }
+      ]
+    },
+    {
+      "time": 50,
+      "spawns": [
+        {
+          "enemy": "caster_elite",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 3,
+          "interval": 1
+        }
+      ]
+    }
+  ]
+}

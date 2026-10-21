@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "id": "演示地图",
+  "name": "演示地图",
+  "author": "开发者",
+  "description": "编辑器启动时默认打开的示例战役。",
+  "map": "map/演示地图.json",
+  "initialCost": 15,
+  "costPerSecond": 3,
+  "obstacleCost": 3,
+  "obstacleHp": 100,
+  "obstacleBlock": 30,
+  "obstacleCount": 9,
+  "obstacleRedeployTime": 5,
+  "life": 5,
+  "waves": [
+    {
+      "time": 10,
+      "spawns": [
+        {
+          "enemy": "phantom",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 5,
+          "interval": 2
+        },
+        {
+          "enemy": "caster_elite",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 5,
+          "interval": 1
+        }
+      ]
+    },
+    {
+      "time": 25,
+      "spawns": [
+        {
+          "enemy": "originium_slug",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 10,
+          "interval": 1
+        }
+      ]
+    },
+    {
+      "time": 50,
+      "spawns": [
+        {
+          "enemy": "caster_elite",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 3,
+          "interval": 1
+        }
+      ]
+    }
+  ]
+}

@@ -21,7 +21,7 @@
         <g4p.version>4.3.11</g4p.version>
         <junit.version>5.10.2</junit.version>
 
-        <main.class>com.yestercar.Main</main.class>
+        <main.class>com.yestercar.GameMain</main.class>
     </properties>
 
     <!--
@@ -37,11 +37,31 @@
       详见 docs/具体设计.md 第一部分。
     -->
     <dependencies>
-        <!-- Processing 渲染层：以普通库形式引入，JAVA2D 渲染器不需要 JOGL 原生库 -->
+        <!-- Processing 渲染层：以普通库形式引入 -->
         <dependency>
             <groupId>org.processing</groupId>
             <artifactId>core</artifactId>
             <version>${processing.version}</version>
+        </dependency>
+
+        <!--
+          JOGL（OpenGL 绑定）：P2D/P3D 渲染器的运行时依赖。JAVA2D 不需要它们
+          （见上注释）；2026-10 应需求切换 P2D 时引入。
+          -main 构件会连带拉取各平台的原生库（Windows/Linux/macOS，约 +15MB jar 体积）。
+          若要回退 JAVA2D：删掉这两项依赖 + GameOpeningApp.settings() 里的 P2D 即可。
+          版本：中央仓库没有 Processing 4.5 官方配套的 2.4.x（只发在 jogamp 自家仓库），
+          2.3.2 缺 GLContext.getGLSLVersionNumber()（NoSuchMethodError 实测），
+          2.6.0 是中央仓库上 >=2.4 的唯一选择，实测可用。
+        -->
+        <dependency>
+            <groupId>org.jogamp.gluegen</groupId>
+            <artifactId>gluegen-rt-main</artifactId>
+            <version>2.6.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jogamp.jogl</groupId>
+            <artifactId>jogl-all-main</artifactId>
+            <version>2.6.0</version>
         </dependency>
 
         <!-- UI 控件库：来自项目内本地仓库 .mvn/repo（见上方说明） -->
@@ -57,6 +77,14 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <!--
+          注意：这里曾经引入过 spine-libgdx + gdx 用于渲染 .skel 骨骼动画（约 +2.2 MB）。
+          后来改用导出好的 GIF（data/anim/w/w.gif），由 JDK 自带的 javax.imageio 解码，
+          于是把那两个依赖移除了 —— 少 2.2 MB，也少一层原生库风险。
+
+          若将来要重新启用骨骼动画，可参考 docs/Spine动画接入评估.md。
+        -->
     </dependencies>
 
     <build>
@@ -101,6 +129,10 @@
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>${main.class}</mainClass>
                                 </transformer>
+                                <!-- 合并 META-INF/services（JOGL 用 ServiceLoader 发现工厂类，
+                                     不合并的话 fat jar 里只会保留一个构件的服务文件） -->
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                             </transformers>
                             <filters>
                                 <filter>
