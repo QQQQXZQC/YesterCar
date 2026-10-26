@@ -967,11 +967,13 @@ public final class BattleDirector {
                 continue;
             }
             for (OperatorUnit ally : deployment.deployed()) {
-                if (ally == aura || !ally.alive()) {
+                if (!ally.alive()) {
                     continue;
                 }
-                if (Math.abs(ally.col() - aura.col()) + Math.abs(ally.row() - aura.row()) != 1) {
-                    continue;                     // 只要上下左右相连的四格
+                if (ally != aura
+                        && Math.abs(ally.col() - aura.col())
+                        + Math.abs(ally.row() - aura.row()) != 1) {
+                    continue;       // 上下左右相连的四格；**自身格也算**（蛇屠箱）
                 }
                 defBonus.merge(ally, t.defAura(), Float::sum);
             }
@@ -1417,6 +1419,17 @@ public final class BattleDirector {
     }
 
     /**
+     * 固定攻击力加成（特性里的 {@code atkBonusFlat}，例如莫斯提马 +200）。
+     *
+     * @param u 干员
+     * @return 加成值（0 = 无）
+     */
+    private float atkFlatOf(OperatorUnit u) {
+        TraitState st = traitStates.get(u);
+        return st == null ? 0f : Math.max(0f, st.def.atkBonusFlat());
+    }
+
+    /**
      * 这个干员当前的攻击伤害类型（史尔特尔的"熔火"会把物理改成法术）。
      *
      * @param u 干员
@@ -1465,7 +1478,7 @@ public final class BattleDirector {
     private float damageOf(OperatorUnit u, Enemy t, float atkMul) {
         com.yestercar.common.model.DamageType type = damageTypeOf(u);
         TraitState st = traitStates.get(u);
-        float atk = u.type().atk() * atkScaleOf(u) * atkMul;
+        float atk = u.type().atk() * atkScaleOf(u) * atkMul + atkFlatOf(u);
         int res = Math.round(t.type().res() * t.resFactor(time));   // 巫恋「溃败暗示」
         float def = t.type().def() * t.defFactor(time);
         if (st != null && st.def.resPierce() > 0f) {
@@ -1848,7 +1861,7 @@ public final class BattleDirector {
             out.add(new UnitView(u.col(), u.row(), u.facing(), u.type().name(),
                     u.hp(), u.maxHp(), u.blockingWeight(), u.effectiveBlock(),
                     u.timeSinceAttack(), u.hitFlash(),
-                    Math.round(u.type().atk() * atkScaleOf(u)),
+                    Math.round(u.type().atk() * atkScaleOf(u) + atkFlatOf(u)),
                     Math.round(defOf(u)), Math.round(resOf(u))));
         }
         return out;

@@ -81,7 +81,7 @@
       "name": "壳状防御",
       "trigger": "passive",
       "defAura": 200,
-      "description": "周围相连四格的友方单位防御力+200"
+      "description": "周围相连四格的友方单位（含自身）防御力+200"
     },
     {
       "operator": "gumi",
@@ -154,9 +154,9 @@
       "operator": "dusk",
       "name": "点睛",
       "trigger": "passive",
-      "killStackAtk": 0.06,
-      "killStackMax": 18,
-      "description": "每击杀一名敌人，攻击力提升6%，最多可以叠加18层"
+      "killStackAtk": 0.1,
+      "killStackMax": 20,
+      "description": "每击杀一名敌人，攻击力提升10%，最多可以叠加20层"
     },
     {
       "operator": "eyjafjalla",
@@ -171,8 +171,9 @@
       "operator": "mostima",
       "name": "主观缓时",
       "trigger": "passive",
-      "slowAura": 0.7,
-      "description": "在场时，攻击范围内所有敌方单位移动速度减少30%"
+      "slowAura": 0.6,
+      "description": "在场时，攻击力+200，攻击范围内所有敌方单位移动速度减少40%",
+      "atkBonusFlat": 200
     },
     {
       "operator": "eyjafjalla_the_hvit_aska",

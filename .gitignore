@@ -9,3 +9,5 @@ target/
 *.ipr
 .vscode/
 data/settings.properties
+# 单元测试不随正式源码上传（仅本地保留）
+src/test/
