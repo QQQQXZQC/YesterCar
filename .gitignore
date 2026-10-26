@@ -71,3 +71,6 @@ data/settings.properties
 # IDE 私有配置与骨骼调试工具（不入库）
 .idea/
 tools/
+
+# 打包产物（曾误提交，269MB）
+*.zip
