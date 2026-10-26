@@ -2631,10 +2631,13 @@ public final class BattleScreen {
 
         int total = director == null ? 0 : director.totalEnemies();
         int killed = director == null ? 0 : director.killedCount();
+        // 漏怪也算"已清理"：走到蓝门即离场，计入分子，使结束时 a == b
+        int leaked = scene == null ? 0 : scene.leaked();
+        int done = killed + leaked;
         g.fill(0xFFFFFFFF);
         g.textAlign(PConstants.LEFT, PConstants.CENTER);
         g.textSize(30);
-        g.text(killed + "/" + total, x + 12f + iconSize + 12f, y + h / 2f);
+        g.text(done + "/" + total, x + 12f + iconSize + 12f, y + h / 2f);
     }
 
     private void drawBlueHp() {
