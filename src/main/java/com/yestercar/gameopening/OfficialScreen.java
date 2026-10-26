@@ -196,8 +196,8 @@ final class OfficialScreen {
         }
         float px = 1160f;
         float py = 30f;    // 两次上移共 220（250 → 30）
-        float pw = 240f;
-        float ph = 420f;   // 原 300：描述字号加大后需要更多空间
+        float pw = 260f;   // 左右各留 16
+        float ph = 300f;   // 面板高度（固定）
 
         g.noStroke();
         g.fill(60f, 60f, 60f, 190f);            // 半透明灰底
@@ -208,11 +208,11 @@ final class OfficialScreen {
         g.rect(d.x(px), d.y(py), d.w(pw), d.h(ph), 4f);
         g.noStroke();
 
-        fonts.apply(g, Fonts.Role.MONO, 13f);
+        fonts.apply(g, Fonts.Role.MONO, 19f);
         g.textAlign(PConstants.CENTER, PConstants.TOP);
         g.fill(255, 255, 255);
-        fonts.text(g, "MS-" + (idx + 1) + "  " + selected.name(),
-                d.x(px + pw / 2f), d.y(py + 22f));
+        fonts.text(g, "MS-" + numberFromId(selected.id()) + "  " + selected.name(),
+                d.x(px + pw / 2f), d.y(py + 24f));
 
         // 关卡简介（标题下方）：按面板宽度自动折行，最多 4 行，超出加省略号
         String desc = selected.meta().description();
@@ -220,16 +220,20 @@ final class OfficialScreen {
             fonts.apply(g, Fonts.Role.MONO, 12f);
             g.fill(255, 255, 255, 210f);
             g.textAlign(PConstants.CENTER, PConstants.TOP);
-            // 行数上限按面板高度算：起始 58，到底部留 60 给按钮
-            int maxLines = Math.max(3, (int) ((ph - 58f - 60f) / 20f));
-            java.util.List<String> lines = wrapText(desc, pw - 28f, maxLines);
-            float ly = py + 58f;
+            // 320 高：标题 42 + 描述 + 按钮区 56，行高 20 → 最多 11 行
+            java.util.List<String> lines = wrapText(desc, pw - 32f, 11);
+            float ly = py + 46f;
             for (String line : lines) {
                 fonts.text(g, line, d.x(px + pw / 2f), d.y(ly));
                 ly += 20f;
             }
         }
         fonts.apply(g, Fonts.Role.MONO, 13f);
+
+        // 「准备作战」放在面板内部底部，水平居中
+        float btnW = BTN_W * 0.88f;
+        readyButton.at(d.x(px + pw / 2f - btnW / 2f), d.y(py + ph - 52f),
+                d.w(btnW), d.h(44f));
     }
 
     /**
@@ -279,8 +283,7 @@ final class OfficialScreen {
         // 「准备作战」在右下角 —— 与自定义页同一位置，两页手感一致
         // 放进右侧灰底面板里（面板 1160..1400 × 250..550）
         // 水平居中于右侧灰底面板（面板 1160..1400，中心 1280）
-        float btnW = BTN_W * 0.9f;
-        readyButton.at(d.x(1280f - btnW / 2f), d.y(388f), d.w(btnW), d.h(44f));
+        // 按钮位置由 drawDetailPanel() 每帧跟随面板底部设定
     }
 
     // ------------------------------------------------------------------

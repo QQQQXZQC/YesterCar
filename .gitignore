@@ -21,7 +21,7 @@ target/
 # 需要时自行下载，只把**用到的那几个文件**拷进 data/ 或 resources/。
 ArknightsGameResource-main/
 # UI 是参考用的前端设计资料（ak-ui），跑不到 Java 工程里，也不必入库
-UI/
+/UI/
 # SpineViewer 是第三方的 .skel 预览工具（.NET 自包含程序，167 MB），
 # 只是拿来核对素材用的，与工程无关
 SpineViewer-*/
