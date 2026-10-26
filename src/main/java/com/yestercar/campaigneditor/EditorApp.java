@@ -80,10 +80,10 @@ import java.util.List;
 public class EditorApp extends PApplet {
 
     /** 窗口宽度。 */
-    public static final int WINDOW_W = LayoutRegions.WINDOW_W;
+    public static int WINDOW_W = LayoutRegions.WINDOW_W;
 
     /** 窗口高度。 */
-    public static final int WINDOW_H = LayoutRegions.WINDOW_H;
+    public static int WINDOW_H = LayoutRegions.WINDOW_H;
 
     // ---- 黑屏过渡 ----
     public static final int FADE_IN_MS = 250;
@@ -248,14 +248,67 @@ public class EditorApp extends PApplet {
 
     @Override
     public void settings() {
+        // 默认尺寸与游戏本体一致：可用屏幕区域内按 16:9 取整，并夹在最小尺寸之上。
+        // 这样低分辨率屏幕不会一开就撑满、把边界按钮顶到屏幕外。
+        int[] wh = resolveWindowSize();
+        WINDOW_W = wh[0];
+        WINDOW_H = wh[1];
+        LayoutRegions.setWindowSize(WINDOW_W, WINDOW_H);
         size(WINDOW_W, WINDOW_H, JAVA2D);
         UITheme.disablePixelDensityScaling(this);
+    }
+
+    /**
+     * 计算编辑器窗口的初始尺寸。
+     *
+     * <p>规则与游戏本体一致：先取屏幕可用区域（扣掉任务栏），按 16:9 向下取整，
+     * 再夹到 {@link LayoutRegions#MIN_WINDOW_W} / {@link LayoutRegions#MIN_WINDOW_H} 之上。
+     * 若配置文件记过上次尺寸，优先用它（同样做一次越界修正）。
+     *
+     * @return 长度为 2 的数组：{@code [0]} 宽、{@code [1]} 高
+     */
+    private int[] resolveWindowSize() {
+        java.awt.Dimension usable;
+        try {
+            java.awt.Rectangle r = java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment()
+                    .getMaximumWindowBounds();
+            usable = new java.awt.Dimension(r.width, r.height);
+        } catch (Exception ex) {
+            usable = new java.awt.Dimension(LayoutRegions.MIN_WINDOW_W, LayoutRegions.MIN_WINDOW_H);
+        }
+        int maxW = Math.max(LayoutRegions.MIN_WINDOW_W, usable.width - 60);
+        int maxH = Math.max(LayoutRegions.MIN_WINDOW_H, usable.height - 80);
+
+        int w = 0;
+        int h = 0;
+        try {
+            int[] last = Settings.inWorkspace().getWindowSize();
+            w = last[0];
+            h = last[1];
+        } catch (Exception ignored) {
+            // 配置读不到就走默认
+        }
+        if (w <= 0 || h <= 0) {
+            // 16:9 向下取整，且不超过可用区域
+            w = Math.min(maxW, Math.round(maxH * 16f / 9f));
+            h = Math.round(w * 9f / 16f);
+            if (h > maxH) {
+                h = maxH;
+                w = Math.round(h * 16f / 9f);
+            }
+        }
+        w = Math.max(LayoutRegions.MIN_WINDOW_W, Math.min(w, maxW));
+        h = Math.max(LayoutRegions.MIN_WINDOW_H, Math.min(h, maxH));
+        System.out.printf("[EditorApp] 可用区 %dx%d → 窗口 %dx%d%n", usable.width, usable.height, w, h);
+        return new int[]{w, h};
     }
 
     @Override
     public void setup() {
         UITheme.apply(this);
         surface.setTitle("YesterCar — 战役编辑器");
+        // 可最大化/自由缩放：布局由 LayoutRegions.setWindowSize 跟随重算
+        surface.setResizable(true);
 
         font = createFont(UITheme.resolvedFontFamily(), UITheme.FONT_SIZE, true);
 
@@ -391,6 +444,7 @@ public class EditorApp extends PApplet {
 
     @Override
     public void draw() {
+        syncWindowSize();
         waveActions.clear();     // 每帧重建动作表（侧栏与波次面板共用这个池）
         switch (phase) {
             case LOADING -> {
@@ -407,6 +461,26 @@ public class EditorApp extends PApplet {
     // ==================================================================
     // 编辑器界面
     // ==================================================================
+
+    /**
+     * 窗口尺寸变化时重算布局。
+     *
+     * <p>用户拖动窗口或最大化后，{@code width/height} 会变；这里把新尺寸交给
+     * {@link LayoutRegions#setWindowSize}，并同步地图视口区域，
+     * 保证工具栏、属性栏、波次区、状态栏都跟着走，不会有按钮留在旧坐标上。
+     */
+    private void syncWindowSize() {
+        if (width == LayoutRegions.WINDOW_W && height == LayoutRegions.WINDOW_H) {
+            return;
+        }
+        LayoutRegions.setWindowSize(width, height);
+        WINDOW_W = LayoutRegions.WINDOW_W;
+        WINDOW_H = LayoutRegions.WINDOW_H;
+        if (viewport != null) {
+            viewport.setArea(LayoutRegions.mapArea());
+        }
+        System.out.println("[EditorApp] 窗口尺寸变化 → " + width + "×" + height);
+    }
 
     private void drawEditor() {
         // 白底 + 深色文字：与加载界面/主菜单的深色相反，见类注释
@@ -2749,6 +2823,14 @@ public class EditorApp extends PApplet {
                 status = "已取消关闭（改动未保存）";
                 return;
             }
+        }
+        try {
+            if (settings != null && width > 0 && height > 0) {
+                settings.setWindowSize(width, height);
+                settings.save();
+            }
+        } catch (Exception ignored) {
+            // 记不住也无所谓，不影响关闭
         }
         super.exit();
     }

@@ -27,9 +27,24 @@ package com.yestercar.campaigneditor.view;
  */
 public final class LayoutRegions {
 
-    // ---- 窗口 ----
-    public static final int WINDOW_W = 1600;
-    public static final int WINDOW_H = 960;
+    // ---- 窗口（**可变**：随实际窗口尺寸重算，见 setWindowSize） ----
+    /** 窗口宽。默认 1600，编辑器启动时会按可用屏幕区域重算。 */
+    public static int WINDOW_W = 1600;
+
+    /** 窗口高。默认 960。 */
+    public static int WINDOW_H = 960;
+
+    /** 窗口最小宽度：再小就会让工具栏与属性栏挤在一起。 */
+    public static final int MIN_WINDOW_W = 1200;
+
+    /**
+     * 窗口最小高度。
+     *
+     * <p>取 700 而不是 760：1280×720 的笔记本可用高约 680~700，
+     * 760 会让窗口底部超出屏幕。700 时内容行仍有约 330 像素，
+     * 地图视口会自动缩放，功能不受影响。
+     */
+    public static final int MIN_WINDOW_H = 700;
 
     /** 窗口四周边距。 */
     public static final int MARGIN = 16;
@@ -63,7 +78,7 @@ public final class LayoutRegions {
     public static final int CONTENT_Y = MARGIN + HEADER_H + GAP;
 
     /** 状态栏顶部 y。 */
-    public static final int STATUS_Y = WINDOW_H - MARGIN - STATUS_H;
+    public static int STATUS_Y = WINDOW_H - MARGIN - STATUS_H;
 
     /**
      * 波次区顶部 y，由状态栏往上推。
@@ -71,7 +86,7 @@ public final class LayoutRegions {
      * <p>之所以从**底部往顶部**推导（而不是从内容行往下加），是为了让
      * 「状态栏贴住下边距」这个约束绝对成立 —— 它是最后一行，最容易被挤出去。
      */
-    public static final int WAVE_Y = STATUS_Y - GAP - WAVE_H;
+    public static int WAVE_Y = STATUS_Y - GAP - WAVE_H;
 
     /**
      * 内容行的高度 = 剩余空间 = 窗口高 - 三个固定行高 - 5 个间距。
@@ -79,12 +94,32 @@ public final class LayoutRegions {
      * <p>由「剩余空间」反推，而不是另写一个算式 —— 这样只要窗口尺寸或某个行高改了，
      * 内容行会自动吸收差额，不会出现某一行被挤出窗口。
      */
-    public static final int CONTENT_H = WAVE_Y - GAP - CONTENT_Y;
+    public static int CONTENT_H = WAVE_Y - GAP - CONTENT_Y;
 
     /** 地图区宽度 = 窗口宽 - 左右边距 - 属性栏 - 间距。 */
-    public static final int MAP_W = WINDOW_W - MARGIN * 2 - SIDEBAR_W - GAP;
+    public static int MAP_W = WINDOW_W - MARGIN * 2 - SIDEBAR_W - GAP;
 
     private LayoutRegions() {
+    }
+
+    /**
+     * 按实际窗口尺寸重算所有派生几何。
+     *
+     * <p>窗口可缩放之后，布局不能再依赖写死的 1600×960：
+     * 工具栏、波次区、状态栏保持固定高度，<strong>中间的内容行与地图区自动吸收差额</strong>，
+     * 因此最大化时地图区变大，缩小时变小，按钮不会被挤出屏幕。
+     *
+     * @param w 实际窗口宽（像素）
+     * @param h 实际窗口高（像素）
+     */
+    public static void setWindowSize(int w, int h) {
+        WINDOW_W = Math.max(MIN_WINDOW_W, w);
+        WINDOW_H = Math.max(MIN_WINDOW_H, h);
+
+        STATUS_Y = WINDOW_H - MARGIN - STATUS_H;
+        WAVE_Y = STATUS_Y - GAP - WAVE_H;
+        CONTENT_H = WAVE_Y - GAP - CONTENT_Y;
+        MAP_W = WINDOW_W - MARGIN * 2 - SIDEBAR_W - GAP;
     }
 
     /**
