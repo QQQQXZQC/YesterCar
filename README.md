@@ -285,51 +285,6 @@ YesterCar/
 
 ---
 
-## 九、📄 开源许可证
-
-本项目**原创代码部分**采用 [MIT License](LICENSE) 授权：
-
-```
-MIT License
-
-Copyright (c) 2026 YesterCar
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
-
-**MIT 许可证仅适用于本人独立编写的源代码部分，不包含任何来自《明日方舟》的美术、音频、IP 相关素材**（详见[第八节](#八版权免责声明)）。
-
-第三方依赖遵循其各自许可证：
-
-| 依赖 | 许可证 |
-| --- | --- |
-| Processing | LGPL 2.1 |
-| JOGL / GlueGen | BSD 2-Clause |
-| G4P | 见 `third_party/G4P/` 内说明 |
-
----
-
-<div align="center">
-    <strong>明日方舟 © HYPERGRYPH / 上海鹰角网络科技有限公司</strong>
-	</br>本项目为非官方同人作品，仅供学习交流
-</div>
-
 ## PS
 
 **另外本项目因为时间紧张、产能不足(bushi)等问题，出现了很多与原作不符的内容，包括但不限于：**
