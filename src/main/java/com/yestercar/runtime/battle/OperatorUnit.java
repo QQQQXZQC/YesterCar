@@ -39,6 +39,20 @@ final class OperatorUnit {
     private boolean alive = true;
 
     /**
+     * 角色特性对阻挡数的临时覆盖（{@code -1} = 没有覆盖）。
+     *
+     * <p>桃金娘的特性：部署后 7 秒内阻挡数变成 0（回费期间不挡人），结束后回到
+     * {@link com.yestercar.common.model.Operator#block()}。
+     */
+    private int blockOverride = -1;
+
+    /** 攻击间隔缩放（能天使「火力电台」叠攻速用）：1 = 不变，越小攻速越快。 */
+    private float intervalScale = 1f;
+
+    /** 最大生命倍率（凯尔希「遗尘守望」攻击范围内 +15%）：1 = 不变。 */
+    private float hpScale = 1f;
+
+    /**
      * @param type   类型定义
      * @param col    所在列
      * @param row    所在行
@@ -103,7 +117,28 @@ final class OperatorUnit {
      * @return 放得下返回 {@code true}
      */
     boolean hasBlockRoom(int weight) {
-        return alive() && blockingWeight + Math.max(1, weight) <= type.block();
+        return alive() && blockingWeight + Math.max(1, weight) <= effectiveBlock();
+    }
+
+    /**
+     * 角色特性对阻挡数的临时覆盖。
+     *
+     * @param value 覆盖值；{@code -1} 表示取消覆盖（回到 {@code type.block()}）
+     */
+    void setBlockOverride(int value) {
+        this.blockOverride = value < 0 ? -1 : value;
+        // 覆盖把上限压到当前占用以下时，多余的挡位立刻放掉（敌人回到路径上）
+        while (blockingWeight > effectiveBlock()) {
+            blockingWeight--;
+            blockingCount = Math.max(0, blockingCount - 1);
+        }
+    }
+
+    /**
+     * @return 当前生效的阻挡上限（特性覆盖优先）
+     */
+    int effectiveBlock() {
+        return blockOverride >= 0 ? blockOverride : type.block();
     }
 
     /**
@@ -154,7 +189,7 @@ final class OperatorUnit {
         if (!alive || amount <= 0f) {
             return 0f;
         }
-        float max = type.hp();
+        float max = maxHp();
         float before = hp;
         hp = Math.min(max, hp + amount);
         return hp - before;
@@ -164,7 +199,24 @@ final class OperatorUnit {
      * @return 血量比例（0–1）
      */
     float hpRatio() {
-        return type.hp() <= 0 ? 0f : Math.max(0f, hp / type.hp());
+        float max = maxHp();
+        return max <= 0f ? 0f : Math.max(0f, hp / max);
+    }
+
+    /**
+     * @return 当前最大生命（含特性加成）
+     */
+    float maxHp() {
+        return type.hp() * hpScale;
+    }
+
+    /**
+     * 最大生命倍率（光环内 +15%）。
+     *
+     * @param scale 倍率（1 = 不变）
+     */
+    void setHpScale(float scale) {
+        this.hpScale = scale <= 0f ? 1f : scale;
     }
 
     void takeDamage(float damage) {
@@ -237,8 +289,17 @@ final class OperatorUnit {
      * （Defender 用 {@code =}，把间隔量化到 1/30 秒；我们保留 {@code +=}，
      * 它对帧步长更稳，且不改变"无目标不消耗"这条语义）。
      */
+    /**
+     * 攻速缩放（1 = 原始攻击间隔）。
+     *
+     * @param scale 缩放系数（0.5 = 攻击间隔减半）
+     */
+    void setIntervalScale(float scale) {
+        this.intervalScale = scale <= 0f ? 1f : scale;
+    }
+
     void markAttacked() {
-        float iv = Math.max(0.01f, type.attackInterval());
+        float iv = Math.max(0.01f, type.attackInterval() * intervalScale);
         attackTimer += iv;
         if (attackTimer <= 0f) {
             attackTimer = iv;

@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "id": "ms-1",
+  "name": "苏醒",
+  "author": "尘辙",
+  "description": "你醒了，博士，敌人先锋部队已经抵达，请部署干员进行拦截。",
+  "map": "map/ms-1.json",
+  "initialCost": 10,
+  "costPerSecond": 1,
+  "life": 15,
+  "obstacleCost": 3,
+  "obstacleHp": 100,
+  "obstacleBlock": 30,
+  "obstacleCount": 0,
+  "obstacleRedeployTime": 5,
+  "waves": [
+    {
+      "time": 5,
+      "spawns": [
+        { "enemy": "originium_slug", "door": 1, "targetBlueDoor": 0, "count": 1, "interval": 1 }
+      ]
+    },
+    {
+      "time": 12,
+      "spawns": [
+        { "enemy": "originium_slug", "door": 1, "targetBlueDoor": 0, "count": 2, "interval": 1 }
+      ]
+    },
+    {
+      "time": 19,
+      "spawns": [
+        { "enemy": "originium_slug", "door": 1, "targetBlueDoor": 0, "count": 2, "interval": 2 }
+      ]
+    },
+    {
+      "time": 25,
+      "spawns": [
+        { "enemy": "soldier", "door": 0, "targetBlueDoor": 0, "count": 1, "interval": 1 }
+      ]
+    },
+    {
+      "time": 37,
+      "spawns": [
+        { "enemy": "soldier", "door": 0, "targetBlueDoor": 0, "count": 1, "interval": 1 },
+        { "enemy": "originium_slug", "door": 1, "targetBlueDoor": 0, "count": 1, "interval": 1 }
+      ]
+    },
+    {
+      "time": 54,
+      "spawns": [
+        { "enemy": "soldier", "door": 0, "targetBlueDoor": 0, "count": 1, "interval": 1 }
+      ]
+    },
+    {
+      "time": 61,
+      "spawns": [
+        { "enemy": "originium_slug", "door": 0, "targetBlueDoor": 0, "count": 1, "interval": 1 }
+      ]
+    },
+    {
+      "time": 64,
+      "spawns": [
+        { "enemy": "originium_slug", "door": 1, "targetBlueDoor": 0, "count": 2, "interval": 3 }
+      ]
+    },
+    {
+      "time": 71,
+      "spawns": [
+        { "enemy": "soldier", "door": 0, "targetBlueDoor": 0, "count": 2, "interval": 2 }
+      ]
+    }
+  ]
+}

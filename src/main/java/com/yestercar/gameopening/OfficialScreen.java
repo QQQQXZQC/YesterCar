@@ -145,9 +145,22 @@ final class OfficialScreen {
     private static final float NODE_H = 66f;
 
     /** 有 Boss 的关卡下标（纯 UI 标记，不读数据）。 */
-    private static final java.util.Set<Integer> BOSS_NODES = java.util.Set.of(4, 7);
+    /** Boss 关按 **id** 判定（ms-5 / ms-8），不再依赖下标。 */
+    private static final java.util.Set<String> BOSS_IDS =
+            java.util.Set.of("ms-5", "ms-8");
 
     /** 画 M 形连线（相邻关卡之间）。 */
+    /**
+     * 从 id 里取关卡编号：{@code ms-5} → {@code 5}。
+     *
+     * @param id 战役 id
+     * @return 编号；取不到时返回 id 本身
+     */
+    private static String numberFromId(String id) {
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("([0-9]+)").matcher(id);
+        return m.find() ? m.group(1) : id;
+    }
+
     private void drawMLines() {
         g.stroke(255, 255, 255, 0.55f * 255f);
         g.strokeWeight(d.len(2f));
@@ -184,7 +197,7 @@ final class OfficialScreen {
         float px = 1160f;
         float py = 30f;    // 两次上移共 220（250 → 30）
         float pw = 240f;
-        float ph = 300f;
+        float ph = 420f;   // 原 300：描述字号加大后需要更多空间
 
         g.noStroke();
         g.fill(60f, 60f, 60f, 190f);            // 半透明灰底
@@ -201,16 +214,55 @@ final class OfficialScreen {
         fonts.text(g, "MS-" + (idx + 1) + "  " + selected.name(),
                 d.x(px + pw / 2f), d.y(py + 22f));
 
-        // 关卡简介（标题下方，可后续编辑）
+        // 关卡简介（标题下方）：按面板宽度自动折行，最多 4 行，超出加省略号
         String desc = selected.meta().description();
         if (desc != null && !desc.isBlank()) {
-            fonts.apply(g, Fonts.Role.MONO, 9f);
-            g.fill(255, 255, 255, 200f);
+            fonts.apply(g, Fonts.Role.MONO, 12f);
+            g.fill(255, 255, 255, 210f);
             g.textAlign(PConstants.CENTER, PConstants.TOP);
-            fonts.text(g, desc, d.x(px + pw / 2f), d.y(py + 48f));
-            g.textAlign(PConstants.CENTER, PConstants.TOP);
+            // 行数上限按面板高度算：起始 58，到底部留 60 给按钮
+            int maxLines = Math.max(3, (int) ((ph - 58f - 60f) / 20f));
+            java.util.List<String> lines = wrapText(desc, pw - 28f, maxLines);
+            float ly = py + 58f;
+            for (String line : lines) {
+                fonts.text(g, line, d.x(px + pw / 2f), d.y(ly));
+                ly += 20f;
+            }
         }
         fonts.apply(g, Fonts.Role.MONO, 13f);
+    }
+
+    /**
+     * 按可用宽度把一段中文折行。
+     *
+     * @param text     原文
+     * @param maxWidth 可用宽度（设计像素）
+     * @param maxLines 最多几行（超出时最后一行加省略号）
+     * @return 折好的行
+     */
+    private java.util.List<String> wrapText(String text, float maxWidth, int maxLines) {
+        java.util.List<String> out = new java.util.ArrayList<>();
+        StringBuilder cur = new StringBuilder();
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            cur.append(c);
+            if (g.textWidth(cur.toString()) > maxWidth) {
+                cur.deleteCharAt(cur.length() - 1);
+                out.add(cur.toString());
+                cur.setLength(0);
+                cur.append(c);
+                if (out.size() == maxLines) {
+                    break;
+                }
+            }
+        }
+        if (out.size() < maxLines && cur.length() > 0) {
+            out.add(cur.toString());
+        } else if (cur.length() > 0 && out.size() == maxLines) {
+            String last = out.get(maxLines - 1);
+            out.set(maxLines - 1, last.substring(0, Math.max(0, last.length() - 1)) + "…");
+        }
+        return out;
     }
 
     private void layout() {
@@ -228,7 +280,7 @@ final class OfficialScreen {
         // 放进右侧灰底面板里（面板 1160..1400 × 250..550）
         // 水平居中于右侧灰底面板（面板 1160..1400，中心 1280）
         float btnW = BTN_W * 0.9f;
-        readyButton.at(d.x(1280f - btnW / 2f), d.y(272f), d.w(btnW), d.h(44f));
+        readyButton.at(d.x(1280f - btnW / 2f), d.y(388f), d.w(btnW), d.h(44f));
     }
 
     // ------------------------------------------------------------------
@@ -249,13 +301,13 @@ final class OfficialScreen {
             CommandCard c = buttons.get(i);
             Campaign camp = items.get(i);
             boolean sel = selected != null && selected.id().equals(camp.id());
-            c.label("MS-" + (i + 1))
+            c.label("MS-" + numberFromId(camp.id()))
                     .meta(camp.meta().waves().size() + "波次 · "
                             + camp.meta().totalEnemies() + "敌")
                     .badge(String.format("%02d", i + 1))
                     // 选中 = 灰；Boss 关（MS-3/MS-5）= 红；其余 = 深色
                     .tone(sel ? CommandCard.Tone.MUTED
-                            : (BOSS_NODES.contains(i) ? CommandCard.Tone.DANGER
+                            : (BOSS_IDS.contains(camp.id()) ? CommandCard.Tone.DANGER
                                     : CommandCard.Tone.DARK))
                     .disabled(false)
                     .selected(sel);

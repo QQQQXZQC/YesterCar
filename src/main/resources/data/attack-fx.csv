@@ -1,0 +1,33 @@
+# basic-attack fx / hit timing. kind=none means melee (slash);
+# release = when the blow lands (melee) or the shot leaves the hand (ranged), seconds of real playback.
+# kinds and speeds follow Defender professions.js + style.js PROJ: arrow 14, bolt 11, orb 10 tiles/s.
+id,kind,release,speed
+chen,none,0.405,0
+blaze,none,0.783,0
+surtr,none,0.150,0
+skadi,none,0.883,0
+mlynar,none,0.950,0
+cuora,none,0.450,0
+gumi,none,0.480,0
+hoshiguma,none,0.633,0
+saria,none,0.992,0
+texas,none,0.367,0
+myrtle,none,0.975,0
+ines,none,0.120,0
+bagpipe,none,0.350,0
+kroos,arrow,0.333,14
+april,arrow,0.767,14
+exusiai,arrow,0.300,14
+w,arrow,1.233,14
+amiya,bolt,0.951,11
+dusk,bolt,1.033,11
+eyjafjalla,bolt,0.500,11
+mostima,bolt,1.473,11
+kaltsit,orb,0.150,10
+reed,orb,0.500,10
+warfarin,orb,0.992,10
+eyjafjalla_the_hvit_aska,orb,1.133,10
+angelina,bolt,0.160,11
+podenco,bolt,0.350,11
+shamare,bolt,0.483,11
+suzuran,bolt,0.967,11

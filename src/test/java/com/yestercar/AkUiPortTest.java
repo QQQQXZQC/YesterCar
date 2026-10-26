@@ -134,13 +134,12 @@ class AkUiPortTest {
     }
 
     @Test
-    @DisplayName("★ 非 16:9 窗口下两轴仍可不等 —— len() 负责兜住变形")
-    void 非16比9时两轴可不等() {
-        // 用户把窗口拖成 4:3 时，sx≠sy 是必然的。
-        // 这时靠 len()（取较小因子）保证圆形/方角不变形 —— 而不是靠基准。
+    @DisplayName("★ 非 16:9 窗口下两轴**仍然相等**（等比缩放 + 居中留边）")
+    void 非16比9时两轴相等() {
+        // 改成等比缩放后：4:3 窗口会左右留边，但文字不会被拉伸。
         DesignSpace d = new DesignSpace(1000, 900);
-        assertTrue(Math.abs(d.sx() - d.sy()) > 0.01f,
-                "4:3 窗口下两轴本就会不同：sx=" + d.sx() + " sy=" + d.sy());
+        assertEquals(d.sx(), d.sy(), 1e-6f,
+                "两轴必须相等：sx=" + d.sx() + " sy=" + d.sy());
         float min = Math.min(d.sx(), d.sy());
         assertEquals(10f * min, d.len(10f), 1e-4f, "len() 必须取较小因子");
     }
@@ -158,12 +157,12 @@ class AkUiPortTest {
     @Test
     @DisplayName("cqw / cqh 与设计基准的百分比一致")
     void 百分比换算正确() {
-        DesignSpace d = new DesignSpace(1366, 653);
-        // 基准尺寸下 1cqw = 13.66px，1cqh = 6.53px
+        DesignSpace d = new DesignSpace(1366, 768);   // 16:9
+        // 基准尺寸下 1cqw = 13.66px，1cqh = 7.68px
         assertEquals(13.66f, d.cqw(1f), 0.01f);
-        assertEquals(6.53f, d.cqh(1f), 0.01f);
+        assertEquals(7.68f, d.cqh(1f), 0.01f);
         assertEquals(1366f, d.cqw(100f), 0.5f);
-        assertEquals(653f, d.cqh(100f), 0.5f);
+        assertEquals(768f, d.cqh(100f), 0.5f);
     }
 
     @Test

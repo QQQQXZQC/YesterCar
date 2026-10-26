@@ -409,17 +409,17 @@ class CampaignTest {
         List<Campaign> all = CampaignLoader.loadOfficial();
         assertFalse(all.isEmpty(), "应当能列出官方战役");
 
-        Campaign c1 = all.stream().filter(c -> c.id().equals("official_01"))
+        Campaign c1 = all.stream().filter(c -> c.id().equals("ms-1"))
                 .findFirst().orElse(null);
-        assertNotNull(c1, "应当有 official_01");
+        assertNotNull(c1, "应当有 ms-1");
         assertTrue(c1.readOnly(), "官方战役必须只读");
         assertTrue(c1.isOfficial());
         assertNull(c1.dir(), "官方战役在 jar 内，没有磁盘目录");
         assertNull(c1.mapFile(), "读不到磁盘路径 —— 要走资源通道");
-        assertEquals("新手训练", c1.name());
+        assertEquals("苏醒", c1.name());
         // 地图文件名绑 **id**（= 目录名），不是显示名 ——
         // 显示名带全角冒号，本来就不能当文件名
-        assertEquals(CampaignMeta.mapPathFor("official_01"), c1.mapRelativePath());
+        assertEquals(CampaignMeta.mapPathFor("ms-1"), c1.mapRelativePath());
     }
 
     @Test
@@ -427,8 +427,8 @@ class CampaignTest {
     void 官方顺序听索引() {
         List<Campaign> all = CampaignLoader.loadOfficial();
         List<String> ids = all.stream().map(Campaign::id).toList();
-        assertTrue(ids.indexOf("official_01") < ids.indexOf("official_02"),
-                "index.json 里 official_01 在前，实际: " + ids);
+        assertTrue(ids.indexOf("ms-1") < ids.indexOf("ms-2"),
+                "index.json 里 ms-1 在前，实际: " + ids);
         assertTrue(ids.size() >= 2, "至少应当有两个官方战役，实际: " + ids);
     }
 
@@ -469,7 +469,7 @@ class CampaignTest {
     @Test
     @DisplayName("官方战役目录下只有 campaign.json 与 map/（没有 levels、也没有复数 maps）")
     void 官方目录结构无多余层级() {
-        List<String> children = Workspace.listResourceChildren("campaigns/official_01");
+        List<String> children = Workspace.listResourceChildren("campaigns/ms-1");
         assertEquals(List.of(CampaignMeta.MAP_DIR), children,
                 "只应有 map 一个子目录，实际: " + children);
         assertFalse(children.contains("levels"),
@@ -486,7 +486,7 @@ class CampaignTest {
     @DisplayName("loadAll 把官方与自定义都收进来")
     void 合并加载() {
         List<Campaign> all = CampaignLoader.loadAll();
-        assertTrue(all.stream().anyMatch(c -> c.id().equals("official_01")));
+        assertTrue(all.stream().anyMatch(c -> c.id().equals("ms-1")));
 
         Campaign debug = CampaignLoader.findById(Workspace.DEBUG_CAMPAIGN_NAME);
         if (debug != null) {
@@ -571,11 +571,11 @@ class CampaignTest {
     @DisplayName("★ 能列出资源目录下的直接子文件（复制官方战役靠它）")
     void 列举资源文件可用() {
         List<String> files = Workspace.listResourceFiles(
-                "campaigns/official_01/" + CampaignMeta.MAP_DIR);
-        assertEquals(List.of("official_01.json"), files,
+                "campaigns/ms-1/" + CampaignMeta.MAP_DIR);
+        assertEquals(List.of("ms-1.json"), files,
                 "map 下应当恰好有一个地图文件（名字 ≡ id），实际: " + files);
 
-        assertFalse(Workspace.listResourceFiles("campaigns").contains("official_01"),
+        assertFalse(Workspace.listResourceFiles("campaigns").contains("ms-1"),
                 "子目录不该出现在文件列表中");
         assertFalse(Workspace.listResourceFiles("campaigns").contains("map_001.json"),
                 "更深的文件不该出现在本层文件列表中");
@@ -589,7 +589,7 @@ class CampaignTest {
     @Test
     @DisplayName("★ 只读战役（官方）不能删")
     void 只读战役拒绝写操作() {
-        Campaign ro = Campaign.readOnlyOfficial(CampaignMeta.create("official_01", "n"));
+        Campaign ro = Campaign.readOnlyOfficial(CampaignMeta.create("ms-1", "n"));
         assertThrows(IOException.class, () -> CampaignStore.delete(ro),
                 "官方战役在 jar 内，删除必须明确失败");
     }

@@ -27,8 +27,19 @@ import java.util.List;
  */
 public final class BattleScene {
 
-    /** 判定"到达蓝门"的距离阈值（格）。策划 §2.2 定的是 0.5 格。 */
-    public static final float ARRIVE_DISTANCE = 0.5f;
+    /**
+     * 判定"已经进入蓝门"的距离阈值（格）。
+     *
+     * <p>⚠️ **必须很小**：这里只是给"刚好踩到门格中心"留的浮点容差。
+     * 早先写成 {@code 0.5}（半个格子），于是敌人**离门还有半格**就被判定成漏怪、
+     * 门当场扣血、敌人凭空消失 —— 画面上就是"还没走到蓝门，生命值先掉了"。
+     *
+     * <p>真正保证"到门才扣血"的是移动本身：waypoint 链的最后一格就是蓝门格，
+     * 走完最后一段时敌人会被吸附到门格中心（距离 ≈ 0），所以 0.05 足够；
+     * 取 0.2 是给块状遮挡/浮点误差留一点余量，视觉上门格半径约 0.5 格，
+     * 0.2 时敌人已经压在门上了。
+     */
+    public static final float ARRIVE_DISTANCE = 0.2f;
 
     private final TileMap map;
 
@@ -49,6 +60,15 @@ public final class BattleScene {
     /** 全局共享的蓝门生命（所有蓝门共用一条命，不再是每门独立）。 */
     /** 已消灭的敌人数（漏怪不算）。 */
     private int killedCount;
+
+    /**
+     * 本帧刚刚"漏出蓝门"的敌人（按对象身份）。
+     *
+     * <p>漏怪与阵亡在引擎里都是 {@code kill()}，统一清理时无法区分，
+     * 靠这张表把漏怪从击杀数里排除。
+     */
+    private final java.util.Set<Enemy> leakedThisFrame =
+            java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
 
     /**
      * @return 已消灭的敌人数
@@ -116,6 +136,19 @@ public final class BattleScene {
             return null;
         }
         Enemy e = new Enemy(type, red.col() + 0.5f, red.row() + 0.5f, blueDoorId);
+        // 固定路线（目前只有爱国者）：出生后停顿 wait 秒，再沿手写航点走
+        EnemyPaths.Path fixed = EnemyPaths.of(type.id());
+        if (fixed != null && !fixed.cells().isEmpty()) {
+            int[][] wps = new int[fixed.cells().size()][2];
+            for (int i = 0; i < wps.length; i++) {
+                wps[i][0] = fixed.cells().get(i)[0];
+                wps[i][1] = fixed.cells().get(i)[1];
+            }
+            e.setWaypoints(wps);
+            if (fixed.stopAt() != null && fixed.delay() > 0f) {
+                e.setStopAt(fixed.stopAt()[0], fixed.stopAt()[1], fixed.delay());
+            }
+        }
         enemies.add(e);
         return e;
     }
@@ -145,17 +178,23 @@ public final class BattleScene {
                 continue;
             }
             moveEnemy(e, dt);
+            e.maybeStop(e.col(), e.row(), time);   // 固定路线：到指定格后停顿
             checkArrival(e);
         }
-        // 移除已经消失的（到达或死亡）
-        // 死掉的计入击杀；到达蓝门的走的是另一条路径（allDoorsLost/blueHp--），
-        // 不会进这里，所以漏怪不会被误算进击杀。
+        // 移除已经消失的（到达或死亡）。
+        // ⚠️ 只有**被打死**的才算击杀：漏怪走的也是 kill()（alive=false），
+        //    所以要用"这一帧刚漏掉的那批"排除掉 —— 否则击杀数会把漏怪也加进去
+        //    （实测：生命扣光时"击杀 4/5"里混着 3 只漏怪，数字对不上）。
         for (int i = enemies.size() - 1; i >= 0; i--) {
-            if (!enemies.get(i).alive()) {
-                killedCount++;
+            Enemy e = enemies.get(i);
+            if (!e.alive()) {
+                if (!leakedThisFrame.remove(e)) {
+                    killedCount++;
+                }
                 enemies.remove(i);
             }
         }
+        leakedThisFrame.clear();
     }
 
     /**
@@ -197,6 +236,14 @@ public final class BattleScene {
                 budget -= d;
                 index++;
             } else {
+                // 朝向跟着移动方向走（远程敌人按朝向镜像攻击范围）
+                if (Math.abs(dx) > 1e-4f || Math.abs(dy) > 1e-4f) {
+                    e.setFacing(Math.abs(dx) >= Math.abs(dy)
+                            ? (dx > 0f ? com.yestercar.common.util.Director.RIGHT
+                                       : com.yestercar.common.util.Director.LEFT)
+                            : (dy > 0f ? com.yestercar.common.util.Director.DOWN
+                                       : com.yestercar.common.util.Director.UP));
+                }
                 e.setPosition(e.x() + dx / d * budget, e.y() + dy / d * budget);
                 budget = 0f;
             }
@@ -216,6 +263,7 @@ public final class BattleScene {
         float dy = e.y() - cy;
         if ((float) Math.sqrt(dx * dx + dy * dy) < ARRIVE_DISTANCE) {
             e.kill();
+            leakedThisFrame.add(e);      // 让统一清理那一步知道"这只是漏出去的，不算击杀"
             if (blueHp < 0) {
                 initBlueHp();
             }

@@ -76,6 +76,61 @@ class BattleSceneTest {
     }
 
     @Test
+    @DisplayName("★ 必须走进蓝门格才扣血（回归：离门半格就扣血）")
+    void 到门口才扣血() {
+        TileMap map = corridorMap();
+        BattleScene scene = new BattleScene(map);
+        Enemy e = scene.spawn(WALKER, 0, 0);
+        // 蓝门在 (4,0)，门格中心就是 (4.5, 0.5)
+        float cx = 4.5f;
+        float cy = 0.5f;
+        float dt = 1f / 60f;
+        float distAtLeak = Float.NaN;
+        for (int i = 0; i < 60 * 20 && !scene.enemies().isEmpty(); i++) {
+            int before = scene.leaked();
+            scene.update(dt);
+            if (scene.leaked() > before) {
+                float dx = e.x() - cx;
+                float dy = e.y() - cy;
+                distAtLeak = (float) Math.sqrt(dx * dx + dy * dy);
+            }
+        }
+        assertEquals(1, scene.leaked(), "应当漏 1 只");
+        assertFalse(Float.isNaN(distAtLeak), "应当记录到漏怪那一刻");
+        // 旧实现 ARRIVE_DISTANCE = 0.5，会在离门半格时就扣血（画面上"没到门就掉血"）
+        assertTrue(distAtLeak < 0.25f,
+                "离蓝门中心还有 " + distAtLeak + " 格就扣血了（应当基本站在门上）");
+        assertTrue(distAtLeak <= BattleScene.ARRIVE_DISTANCE + 1e-3f,
+                "漏怪时的距离应当在判定半径内，实际 " + distAtLeak);
+    }
+
+    @Test
+    @DisplayName("★ 漏怪不算击杀（回归：击杀数曾把漏怪算进去）")
+    void 漏怪不计入击杀() {
+        TileMap map = corridorMap();
+        BattleScene scene = new BattleScene(map);
+        scene.spawn(WALKER, 0, 0);
+        float t = runUntilClear(scene, 1f / 60f, 20f);
+        assertTrue(t < 20f, "敌人应当到达蓝门");
+        assertEquals(1, scene.leaked(), "漏了 1 只");
+        assertEquals(0, scene.killedCount(), "走到蓝门的不该算击杀");
+    }
+
+    @Test
+    @DisplayName("★ 被打死的算击杀，且血量清零")
+    void 打死计入击杀() {
+        TileMap map = corridorMap();
+        BattleScene scene = new BattleScene(map);
+        Enemy e = scene.spawn(WALKER, 0, 0);
+        e.takeDamage(9999f);
+        assertEquals(0f, e.hp(), 1e-4f, "血量应当清零");
+        scene.update(1f / 60f);
+        assertEquals(1, scene.killedCount(), "打死的要算击杀");
+        assertEquals(0, scene.leaked(), "不该算漏怪");
+        assertTrue(scene.enemies().isEmpty(), "死掉的要被移除");
+    }
+
+    @Test
     @DisplayName("出怪：敌人出现在红门中心")
     void 出怪在红门中心() {
         BattleScene scene = new BattleScene(corridorMap());
@@ -389,24 +444,25 @@ class BattleSceneTest {
 
         EnemyType soldier = all.get("soldier");
         assertNotNull(soldier, "应当有 soldier");
-        assertEquals(300, soldier.hp());
-        assertEquals(50, soldier.atk());
-        assertEquals(1.0f, soldier.speed(), 1e-4f);
+        // 官方（PRTS 士兵·级别0）：生命 1650 / 攻击 200 / 移动速度 1.1
+        assertEquals(1650, soldier.hp());
+        assertEquals(200, soldier.atk());
+        assertEquals(1.1f, soldier.speed(), 1e-4f);
         assertFalse(soldier.isRanged());
 
-        // 12 种敌人（第 20 轮：数值表改用 data/enemies.csv）
+        // 13 种敌人（第 20 轮：数值表改用 data/enemies.csv；数值按官方级别0填写）
         assertEquals(13, all.size(), "敌人表应当有 13 种（12 张图 + 爱国者）");
 
         EnemyType caster = all.get("caster_elite");
         assertNotNull(caster, "应当有 caster_elite（高阶术师）");
         assertTrue(caster.isRanged(), "高阶术师应当是远程");
-        assertEquals(3, caster.rangeRadius(), "高阶术师射程 3 格");
+        assertEquals(2.2f, caster.rangeRadius(), 1e-4f, "官方攻击范围半径 2.2");
 
         EnemyType heavy = all.get("heavy_defender");
         assertNotNull(heavy, "应当有 heavy_defender（重装防御者）");
-        assertEquals(150, heavy.def(), "重装防御者防御 150");
+        assertEquals(800, heavy.def(), "官方重装防御者防御 800");
         assertTrue(heavy.res() < 50, "高防敌人法抗应当低（术师才打得动）");
-        assertEquals(3, heavy.blockWeight(), "重装防御者占 3 个阻挡位");
+        assertEquals(1, heavy.blockWeight(), "重装防御者阻挡权重 1（本工程自研机制，非官方字段）");
 
         // 每条都要有图标路径，且指向 data/imgs/enemy/
         for (EnemyType t : all.values()) {

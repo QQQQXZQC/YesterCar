@@ -43,6 +43,14 @@ public final class Enemy {
     private float attackTimer;
 
     /**
+     * 朝向：跟着移动方向更新，攻击范围按它镜像（{@code data/enemy_ranges.json} 只写了 right）。
+     *
+     * <p>为什么必须记：敌人从红门走向蓝门，方向可能是任意一边；范围判定若固定按"朝右"算，
+     * 朝左走的远程敌人就"看不见"前方两格里的我方干员，只能贴上去被阻挡后才开打。
+     */
+    private com.yestercar.common.util.Director facing = com.yestercar.common.util.Director.RIGHT;
+
+    /**
      * 已算好的 waypoint 链（格子下标），以及走到第几个。
      *
      * <p>{@code null} 表示"还没规划过"，下一步移动时才向流场要。
@@ -159,6 +167,35 @@ public final class Enemy {
     }
 
     /**
+     * 距上一次出手过了多久（秒）—— 表现层用它把攻击动画的相位与引擎对齐，
+     * 这样"动画打到人的那一帧"就是"扣血的那一 tick"。
+     *
+     * @return 0 到攻击间隔之间
+     */
+    /**
+     * @return 当前朝向（范围判定用）
+     */
+    public com.yestercar.common.util.Director facing() {
+        return facing;
+    }
+
+    /**
+     * 更新朝向（只认主轴方向；由 {@code BattleScene.moveEnemy} 在移动时写入）。
+     *
+     * @param d 朝向
+     */
+    public void setFacing(com.yestercar.common.util.Director d) {
+        if (d != null) {
+            this.facing = d;
+        }
+    }
+
+    public float attackAge() {
+        float iv = Math.max(0.01f, type.attackInterval());
+        return Math.max(0f, Math.min(iv, iv - attackTimer));
+    }
+
+    /**
      * 设置阻挡状态。
      *
      * @param value 是否正被阻挡
@@ -183,6 +220,15 @@ public final class Enemy {
     /** 减速系数（1 = 不减速）。 */
     private float slowMul = 1f;
 
+    /** 光环减速（与 slowMul 相乘）。 */
+    private float auraMul = 1f;
+    private float auraUntil;
+
+    /** 防御/法抗的临时倍率（巫恋「溃败暗示」）。 */
+    private float defMul = 1f;
+    private float resMul = 1f;
+    private float debuffUntil;
+
     /**
      * 施加减速（重复命中只刷新时长，不叠加）。
      *
@@ -196,11 +242,56 @@ public final class Enemy {
     }
 
     /**
+     * 光环型减速（莫斯提马「主观缓时」）：和 {@link #applySlow} 分开算，两者**相乘**，
+     * 所以可以和辅助干员攻击造成的减速叠加。
+     *
+     * @param now    当前游戏时间
+     * @param mul    速度系数（0.5 = 减速一半）
+     * @param durSec 持续时间（光环每 tick 刷新，给一个很短的时长即可）
+     */
+    /**
+     * 防御力/法术抗性的临时倍率（巫恋「溃败暗示」：-30% 持续 3 秒，不叠加，只刷新时长）。
+     *
+     * @param now     当前时间
+     * @param defMul  防御倍率（0.7 = -30%）
+     * @param resMul  法抗倍率
+     * @param durSec  持续秒数
+     */
+    public void applyDefResDebuff(float now, float defMul, float resMul, float durSec) {
+        this.defMul = Math.max(0.05f, defMul);
+        this.resMul = Math.max(0f, resMul);
+        this.debuffUntil = Math.max(debuffUntil, now + durSec);
+    }
+
+    /**
+     * @param now 当前时间
+     * @return 防御倍率（1 = 没有减益）
+     */
+    public float defFactor(float now) {
+        return now < debuffUntil ? defMul : 1f;
+    }
+
+    /**
+     * @param now 当前时间
+     * @return 法抗倍率（1 = 没有减益）
+     */
+    public float resFactor(float now) {
+        return now < debuffUntil ? resMul : 1f;
+    }
+
+    public void applySlowAura(float now, float mul, float durSec) {
+        this.auraMul = Math.max(0.05f, Math.min(1f, mul));
+        this.auraUntil = Math.max(auraUntil, now + durSec);
+    }
+
+    /**
      * @param now 当前游戏时间
      * @return 当前速度系数（1 = 正常）
      */
     public float slowFactor(float now) {
-        return now < slowUntil ? slowMul : 1f;
+        float s = now < slowUntil ? slowMul : 1f;
+        float a = now < auraUntil ? auraMul : 1f;
+        return Math.max(0.05f, Math.min(1f, s * a));
     }
 
     /** 停步攻击的截止时刻（游戏时间）；小于当前时间表示可以继续走。 */
@@ -219,6 +310,44 @@ public final class Enemy {
      * @param now 当前游戏时间
      * @return 是否正处在"停下攻击"状态
      */
+    /** 固定路线：到这个格子后停顿一次（{@code null} = 不停）。 */
+    private int[] stopCell;
+
+    /** 停顿秒数。 */
+    private float stopSeconds;
+
+    /** 是否已经停过（只停一次）。 */
+    private boolean stopDone;
+
+    /**
+     * 设置"走到某格后停顿"。
+     *
+     * @param col  列
+     * @param row  行
+     * @param secs 停顿时长（秒）
+     */
+    public void setStopAt(int col, int row, float secs) {
+        this.stopCell = new int[]{col, row};
+        this.stopSeconds = secs;
+    }
+
+    /**
+     * 到达停顿时就设置停步（只触发一次）。
+     *
+     * @param col 当前列
+     * @param row 当前行
+     * @param now 当前游戏时间
+     */
+    public void maybeStop(int col, int row, float now) {
+        if (stopDone || stopCell == null) {
+            return;
+        }
+        if (col == stopCell[0] && row == stopCell[1]) {
+            stopDone = true;
+            holdUntil(now + stopSeconds);
+        }
+    }
+
     public boolean holding(float now) {
         return now < holdUntil;
     }

@@ -1,0 +1,522 @@
+{
+  "version": 1,
+  "id": "ms-4",
+  "name": "龟裂",
+  "author": "尘辙",
+  "description": "从未见过的敌方头领以及其精英部队从多个方向发动了巨大攻势，请博士立即部署干员迎击！",
+  "map": "map/ms-4.json",
+  "initialCost": 10,
+  "costPerSecond": 1.0,
+  "life": 3,
+  "obstacleCost": 3,
+  "obstacleHp": 100,
+  "obstacleBlock": 30,
+  "obstacleCount": 0,
+  "obstacleRedeployTime": 5,
+  "waves": [
+    {
+      "time": 3.0,
+      "spawns": [
+        {
+          "enemy": "dual_swordsman",
+          "door": 2,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 10.0,
+      "spawns": [
+        {
+          "enemy": "dual_swordsman",
+          "door": 2,
+          "targetBlueDoor": 0,
+          "count": 2,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 19.0,
+      "spawns": [
+        {
+          "enemy": "dual_swordsman",
+          "door": 3,
+          "targetBlueDoor": 1,
+          "count": 1,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 23.0,
+      "spawns": [
+        {
+          "enemy": "dual_swordsman",
+          "door": 2,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 26.0,
+      "spawns": [
+        {
+          "enemy": "dual_swordsman",
+          "door": 2,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 27.0,
+      "spawns": [
+        {
+          "enemy": "dual_swordsman",
+          "door": 3,
+          "targetBlueDoor": 1,
+          "count": 2,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 33.0,
+      "spawns": [
+        {
+          "enemy": "originium_slug",
+          "door": 1,
+          "targetBlueDoor": 1,
+          "count": 1,
+          "interval": 0.8
+        }
+      ]
+    },
+    {
+      "time": 43.0,
+      "spawns": [
+        {
+          "enemy": "originium_slug",
+          "door": 1,
+          "targetBlueDoor": 1,
+          "count": 2,
+          "interval": 0.8
+        }
+      ]
+    },
+    {
+      "time": 44.0,
+      "spawns": [
+        {
+          "enemy": "originium_slug",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 2,
+          "interval": 0.8
+        }
+      ]
+    },
+    {
+      "time": 56.8,
+      "spawns": [
+        {
+          "enemy": "phantom",
+          "door": 2,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 63.8,
+      "spawns": [
+        {
+          "enemy": "phantom",
+          "door": 2,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1.0
+        },
+        {
+          "enemy": "hound_pro",
+          "door": 2,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 66.8,
+      "spawns": [
+        {
+          "enemy": "phantom",
+          "door": 3,
+          "targetBlueDoor": 1,
+          "count": 1,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 68.8,
+      "spawns": [
+        {
+          "enemy": "phantom",
+          "door": 2,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 0.8
+        },
+        {
+          "enemy": "hound_pro",
+          "door": 2,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1.0
+        },
+        {
+          "enemy": "hound_pro",
+          "door": 3,
+          "targetBlueDoor": 1,
+          "count": 1,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 73.8,
+      "spawns": [
+        {
+          "enemy": "hound_pro",
+          "door": 2,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 74.8,
+      "spawns": [
+        {
+          "enemy": "hound_pro",
+          "door": 3,
+          "targetBlueDoor": 1,
+          "count": 1,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 75.8,
+      "spawns": [
+        {
+          "enemy": "phantom",
+          "door": 3,
+          "targetBlueDoor": 1,
+          "count": 1,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 81.8,
+      "spawns": [
+        {
+          "enemy": "hound_pro",
+          "door": 3,
+          "targetBlueDoor": 1,
+          "count": 1,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 85.8,
+      "spawns": [
+        {
+          "enemy": "phantom",
+          "door": 3,
+          "targetBlueDoor": 1,
+          "count": 2,
+          "interval": 0.8
+        }
+      ]
+    },
+    {
+      "time": 105.6,
+      "spawns": [
+        {
+          "enemy": "soldier",
+          "door": 2,
+          "targetBlueDoor": 0,
+          "count": 2,
+          "interval": 0.8
+        }
+      ]
+    },
+    {
+      "time": 106.6,
+      "spawns": [
+        {
+          "enemy": "soldier",
+          "door": 3,
+          "targetBlueDoor": 1,
+          "count": 2,
+          "interval": 0.8
+        },
+        {
+          "enemy": "phantom",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 0.8
+        }
+      ]
+    },
+    {
+      "time": 107.6,
+      "spawns": [
+        {
+          "enemy": "phantom",
+          "door": 1,
+          "targetBlueDoor": 1,
+          "count": 1,
+          "interval": 0.8
+        }
+      ]
+    },
+    {
+      "time": 113.6,
+      "spawns": [
+        {
+          "enemy": "scavenger",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 0.8
+        }
+      ]
+    },
+    {
+      "time": 114.6,
+      "spawns": [
+        {
+          "enemy": "dual_swordsman",
+          "door": 1,
+          "targetBlueDoor": 1,
+          "count": 1,
+          "interval": 0.8
+        }
+      ]
+    },
+    {
+      "time": 119.6,
+      "spawns": [
+        {
+          "enemy": "soldier",
+          "door": 2,
+          "targetBlueDoor": 0,
+          "count": 2,
+          "interval": 0.8
+        },
+        {
+          "enemy": "phantom",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 0.8
+        }
+      ]
+    },
+    {
+      "time": 120.6,
+      "spawns": [
+        {
+          "enemy": "soldier",
+          "door": 3,
+          "targetBlueDoor": 1,
+          "count": 2,
+          "interval": 0.8
+        },
+        {
+          "enemy": "scavenger",
+          "door": 1,
+          "targetBlueDoor": 1,
+          "count": 1,
+          "interval": 0.8
+        }
+      ]
+    },
+    {
+      "time": 144.4,
+      "spawns": [
+        {
+          "enemy": "scavenger",
+          "door": 4,
+          "targetBlueDoor": 0,
+          "count": 2,
+          "interval": 40.0
+        },
+        {
+          "enemy": "heavy_defender",
+          "door": 5,
+          "targetBlueDoor": 1,
+          "count": 2,
+          "interval": 20.0
+        }
+      ]
+    },
+    {
+      "time": 146.4,
+      "spawns": [
+        {
+          "enemy": "heavy_defender",
+          "door": 5,
+          "targetBlueDoor": 1,
+          "count": 2,
+          "interval": 20.0
+        }
+      ]
+    },
+    {
+      "time": 151.4,
+      "spawns": [
+        {
+          "enemy": "hound_pro",
+          "door": 2,
+          "targetBlueDoor": 0,
+          "count": 3,
+          "interval": 5.0
+        },
+        {
+          "enemy": "hound_pro",
+          "door": 3,
+          "targetBlueDoor": 1,
+          "count": 3,
+          "interval": 5.0
+        }
+      ]
+    },
+    {
+      "time": 176.4,
+      "spawns": [
+        {
+          "enemy": "hound_pro",
+          "door": 2,
+          "targetBlueDoor": 0,
+          "count": 3,
+          "interval": 5.0
+        },
+        {
+          "enemy": "hound_pro",
+          "door": 3,
+          "targetBlueDoor": 1,
+          "count": 3,
+          "interval": 5.0
+        }
+      ]
+    },
+    {
+      "time": 186.4,
+      "spawns": [
+        {
+          "enemy": "scavenger",
+          "door": 5,
+          "targetBlueDoor": 1,
+          "count": 1,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 191.4,
+      "spawns": [
+        {
+          "enemy": "berserk_leader",
+          "door": 4,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 195.4,
+      "spawns": [
+        {
+          "enemy": "phantom",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 3,
+          "interval": 10.0
+        },
+        {
+          "enemy": "phantom",
+          "door": 1,
+          "targetBlueDoor": 1,
+          "count": 2,
+          "interval": 15.0
+        }
+      ]
+    },
+    {
+      "time": 196.4,
+      "spawns": [
+        {
+          "enemy": "dual_swordsman",
+          "door": 4,
+          "targetBlueDoor": 0,
+          "count": 3,
+          "interval": 10.0
+        }
+      ]
+    },
+    {
+      "time": 197.4,
+      "spawns": [
+        {
+          "enemy": "scavenger",
+          "door": 4,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1.0
+        },
+        {
+          "enemy": "scavenger",
+          "door": 5,
+          "targetBlueDoor": 1,
+          "count": 2,
+          "interval": 15.0
+        }
+      ]
+    },
+    {
+      "time": 211.4,
+      "spawns": [
+        {
+          "enemy": "hound_pro",
+          "door": 3,
+          "targetBlueDoor": 1,
+          "count": 2,
+          "interval": 1.0
+        },
+        {
+          "enemy": "hound_pro",
+          "door": 2,
+          "targetBlueDoor": 0,
+          "count": 2,
+          "interval": 1.0
+        }
+      ]
+    }
+  ]
+}

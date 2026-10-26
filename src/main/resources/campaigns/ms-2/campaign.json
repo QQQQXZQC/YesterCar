@@ -1,0 +1,174 @@
+{
+  "version": 1,
+  "id": "ms-2",
+  "name": "幽灵",
+  "author": "尘辙",
+  "description": "初遇Ghost，无法阻挡的幽灵，请博士尽快消灭！",
+  "map": "map/ms-2.json",
+  "initialCost": 10,
+  "costPerSecond": 1.0,
+  "life": 15,
+  "obstacleCost": 3,
+  "obstacleHp": 100,
+  "obstacleBlock": 30,
+  "obstacleCount": 0,
+  "obstacleRedeployTime": 5,
+  "waves": [
+    {
+      "time": 2.0,
+      "spawns": [
+        {
+          "enemy": "phantom",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 5.0
+        }
+      ]
+    },
+    {
+      "time": 5.0,
+      "spawns": [
+        {
+          "enemy": "originium_slug",
+          "door": 1,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 10.0,
+      "spawns": [
+        {
+          "enemy": "originium_slug",
+          "door": 1,
+          "targetBlueDoor": 0,
+          "count": 2,
+          "interval": 3.0
+        }
+      ]
+    },
+    {
+      "time": 23.0,
+      "spawns": [
+        {
+          "enemy": "originium_slug",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 3,
+          "interval": 2.0
+        }
+      ]
+    },
+    {
+      "time": 28.0,
+      "spawns": [
+        {
+          "enemy": "originium_slug",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 2.0
+        }
+      ]
+    },
+    {
+      "time": 41.0,
+      "spawns": [
+        {
+          "enemy": "soldier",
+          "door": 1,
+          "targetBlueDoor": 0,
+          "count": 2,
+          "interval": 5.0
+        }
+      ]
+    },
+    {
+      "time": 59.0,
+      "spawns": [
+        {
+          "enemy": "originium_slug",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 60.0,
+      "spawns": [
+        {
+          "enemy": "hound_pro",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 62.0,
+      "spawns": [
+        {
+          "enemy": "hound_pro",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 3.0
+        }
+      ]
+    },
+    {
+      "time": 76.0,
+      "spawns": [
+        {
+          "enemy": "soldier",
+          "door": 1,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 77.0,
+      "spawns": [
+        {
+          "enemy": "hound_pro",
+          "door": 1,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 79.0,
+      "spawns": [
+        {
+          "enemy": "hound_pro",
+          "door": 1,
+          "targetBlueDoor": 0,
+          "count": 3,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 88.0,
+      "spawns": [
+        {
+          "enemy": "phantom",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 2,
+          "interval": 4.0
+        }
+      ]
+    }
+  ]
+}

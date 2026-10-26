@@ -1,0 +1,286 @@
+{
+  "version": 1,
+  "id": "ms-6",
+  "name": "寄生之潮",
+  "author": "星之清晨",
+  "description": "寄生者无尽的攻击欲正促使它们袭击任何干员。请尽快清除残余的狂暴宿主。",
+  "map": "map/ms-6.json",
+  "initialCost": 10,
+  "costPerSecond": 1.0,
+  "life": 3,
+  "obstacleCost": 3,
+  "obstacleHp": 100,
+  "obstacleBlock": 30,
+  "obstacleCount": 0,
+  "obstacleRedeployTime": 5,
+  "waves": [
+    {
+      "time": 3.0,
+      "spawns": [
+        {
+          "enemy": "scavenger",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 9.0,
+      "spawns": [
+        {
+          "enemy": "scavenger",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 2,
+          "interval": 4.0
+        }
+      ]
+    },
+    {
+      "time": 20.0,
+      "spawns": [
+        {
+          "enemy": "scavenger",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 2,
+          "interval": 4.0
+        },
+        {
+          "enemy": "caster_elite",
+          "door": 1,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 33.0,
+      "spawns": [
+        {
+          "enemy": "scavenger",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 2,
+          "interval": 3.0
+        }
+      ]
+    },
+    {
+      "time": 54.0,
+      "spawns": [
+        {
+          "enemy": "scavenger",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 60.0,
+      "spawns": [
+        {
+          "enemy": "scavenger",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 4,
+          "interval": 11.0
+        }
+      ]
+    },
+    {
+      "time": 66.0,
+      "spawns": [
+        {
+          "enemy": "scavenger",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 2,
+          "interval": 15.0
+        }
+      ]
+    },
+    {
+      "time": 68.0,
+      "spawns": [
+        {
+          "enemy": "scavenger",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 3,
+          "interval": 10.0
+        }
+      ]
+    },
+    {
+      "time": 81.0,
+      "spawns": [
+        {
+          "enemy": "caster_elite",
+          "door": 1,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 99.0,
+      "spawns": [
+        {
+          "enemy": "berserk_leader",
+          "door": 1,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 117.0,
+      "spawns": [
+        {
+          "enemy": "scavenger",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 5,
+          "interval": 11.0
+        },
+        {
+          "enemy": "caster_elite",
+          "door": 1,
+          "targetBlueDoor": 0,
+          "count": 2,
+          "interval": 40.0
+        }
+      ]
+    },
+    {
+      "time": 124.0,
+      "spawns": [
+        {
+          "enemy": "scavenger",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 3,
+          "interval": 15.0
+        }
+      ]
+    },
+    {
+      "time": 126.0,
+      "spawns": [
+        {
+          "enemy": "berserk_leader",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 139.0,
+      "spawns": [
+        {
+          "enemy": "scavenger",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 2,
+          "interval": 20.0
+        }
+      ]
+    },
+    {
+      "time": 154.0,
+      "spawns": [
+        {
+          "enemy": "berserk_leader",
+          "door": 1,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 179.0,
+      "spawns": [
+        {
+          "enemy": "scavenger",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 2,
+          "interval": 20.0
+        },
+        {
+          "enemy": "berserk_leader",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 2,
+          "interval": 30.0
+        },
+        {
+          "enemy": "caster_elite",
+          "door": 1,
+          "targetBlueDoor": 0,
+          "count": 2,
+          "interval": 30.0
+        }
+      ]
+    },
+    {
+      "time": 180.0,
+      "spawns": [
+        {
+          "enemy": "scavenger",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 2,
+          "interval": 20.0
+        }
+      ]
+    },
+    {
+      "time": 191.0,
+      "spawns": [
+        {
+          "enemy": "scavenger",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 2,
+          "interval": 40.0
+        }
+      ]
+    },
+    {
+      "time": 193.0,
+      "spawns": [
+        {
+          "enemy": "scavenger",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 2,
+          "interval": 40.0
+        }
+      ]
+    },
+    {
+      "time": 216.0,
+      "spawns": [
+        {
+          "enemy": "berserk_leader",
+          "door": 1,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1.0
+        }
+      ]
+    }
+  ]
+}

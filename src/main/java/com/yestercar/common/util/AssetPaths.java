@@ -26,6 +26,31 @@ import java.util.List;
  */
 public final class AssetPaths {
 
+    /** 属性图标目录（英文文件名）。 */
+    public static final String ATTRIBUTE_DIR = "data/imgs/attributes/";
+
+    private static final java.util.Map<String, String> ATTR_ICONS = java.util.Map.of(
+            "生命值", "hp",
+            "攻击力", "atk",
+            "法术攻击力", "atk_arts",
+            "防御力", "def",
+            "法抗", "res",
+            "阻挡数", "block",
+            "部署费用", "cost",
+            "再部署时间", "redeploy");
+
+    /**
+     * 属性名 → 图标文件路径。
+     *
+     * @param label 中文属性名
+     * @return 相对工程根路径；未收录时返回 {@code null}
+     */
+    public static String attributeIcon(String label) {
+        String key = ATTR_ICONS.get(label);
+        return key == null ? null : ATTRIBUTE_DIR + key + ".png";
+    }
+
+
     /** 贴图根目录（相对 {@code resources/data/}）。 */
     public static final String TEXTURE_ROOT = "textures/";
 

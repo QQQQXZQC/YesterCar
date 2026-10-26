@@ -1,0 +1,385 @@
+{
+  "version": 1,
+  "id": "ms-7",
+  "name": "遗忘之地",
+  "author": "星之清晨",
+  "description": "浓雾中的遗忘之地，三处隘口暗流翻涌，敌之精锐正分道踏雾而来。",
+  "map": "map/ms-7.json",
+  "initialCost": 10,
+  "costPerSecond": 1,
+  "life": 3,
+  "obstacleCost": 3,
+  "obstacleHp": 100,
+  "obstacleBlock": 30,
+  "obstacleCount": 0,
+  "obstacleRedeployTime": 5,
+  "waves": [
+    {
+      "time": 3,
+      "spawns": [
+        {
+          "enemy": "hound_pro",
+          "door": 1,
+          "targetBlueDoor": 1,
+          "count": 1,
+          "interval": 1
+        }
+      ]
+    },
+    {
+      "time": 7,
+      "spawns": [
+        {
+          "enemy": "hound_pro",
+          "door": 0,
+          "targetBlueDoor": 1,
+          "count": 3,
+          "interval": 2
+        }
+      ]
+    },
+    {
+      "time": 14,
+      "spawns": [
+        {
+          "enemy": "hound_pro",
+          "door": 2,
+          "targetBlueDoor": 2,
+          "count": 2,
+          "interval": 13
+        }
+      ]
+    },
+    {
+      "time": 15,
+      "spawns": [
+        {
+          "enemy": "hound_pro",
+          "door": 1,
+          "targetBlueDoor": 2,
+          "count": 2,
+          "interval": 10
+        }
+      ]
+    },
+    {
+      "time": 20,
+      "spawns": [
+        {
+          "enemy": "soldier",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 5,
+          "interval": 3
+        }
+      ]
+    },
+    {
+      "time": 30,
+      "spawns": [
+        {
+          "enemy": "hound_pro",
+          "door": 1,
+          "targetBlueDoor": 1,
+          "count": 2,
+          "interval": 10
+        }
+      ]
+    },
+    {
+      "time": 31,
+      "spawns": [
+        {
+          "enemy": "caster_elite",
+          "door": 0,
+          "targetBlueDoor": 1,
+          "count": 2,
+          "interval": 10
+        }
+      ]
+    },
+    {
+      "time": 42,
+      "spawns": [
+        {
+          "enemy": "dual_swordsman",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 3,
+          "interval": 2
+        }
+      ]
+    },
+    {
+      "time": 59,
+      "spawns": [
+        {
+          "enemy": "heavy_defender",
+          "door": 5,
+          "targetBlueDoor": 2,
+          "count": 1,
+          "interval": 1
+        }
+      ]
+    },
+    {
+      "time": 70,
+      "spawns": [
+        {
+          "enemy": "caster_elite",
+          "door": 1,
+          "targetBlueDoor": 2,
+          "count": 2,
+          "interval": 30
+        }
+      ]
+    },
+    {
+      "time": 81,
+      "spawns": [
+        {
+          "enemy": "caster_elite",
+          "door": 1,
+          "targetBlueDoor": 2,
+          "count": 1,
+          "interval": 1
+        }
+      ]
+    },
+    {
+      "time": 84,
+      "spawns": [
+        {
+          "enemy": "hound_pro",
+          "door": 0,
+          "targetBlueDoor": 1,
+          "count": 5,
+          "interval": 8
+        }
+      ]
+    },
+    {
+      "time": 91,
+      "spawns": [
+        {
+          "enemy": "hound_pro",
+          "door": 1,
+          "targetBlueDoor": 1,
+          "count": 4,
+          "interval": 10
+        }
+      ]
+    },
+    {
+      "time": 92,
+      "spawns": [
+        {
+          "enemy": "hound_pro",
+          "door": 2,
+          "targetBlueDoor": 2,
+          "count": 3,
+          "interval": 10
+        }
+      ]
+    },
+    {
+      "time": 94,
+      "spawns": [
+        {
+          "enemy": "caster_elite",
+          "door": 0,
+          "targetBlueDoor": 1,
+          "count": 3,
+          "interval": 30
+        }
+      ]
+    },
+    {
+      "time": 112,
+      "spawns": [
+        {
+          "enemy": "heavy_defender",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 2,
+          "interval": 2
+        },
+        {
+          "enemy": "caster_elite",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1
+        }
+      ]
+    },
+    {
+      "time": 137,
+      "spawns": [
+        {
+          "enemy": "crusher",
+          "door": 4,
+          "targetBlueDoor": 2,
+          "count": 1,
+          "interval": 1
+        }
+      ]
+    },
+    {
+      "time": 139,
+      "spawns": [
+        {
+          "enemy": "phantom",
+          "door": 5,
+          "targetBlueDoor": 2,
+          "count": 2,
+          "interval": 1
+        }
+      ]
+    },
+    {
+      "time": 141,
+      "spawns": [
+        {
+          "enemy": "sarkaz_greatsword",
+          "door": 4,
+          "targetBlueDoor": 2,
+          "count": 1,
+          "interval": 1
+        }
+      ]
+    },
+    {
+      "time": 164,
+      "spawns": [
+        {
+          "enemy": "caster_elite",
+          "door": 0,
+          "targetBlueDoor": 1,
+          "count": 1,
+          "interval": 1
+        }
+      ]
+    },
+    {
+      "time": 165,
+      "spawns": [
+        {
+          "enemy": "caster_elite",
+          "door": 1,
+          "targetBlueDoor": 2,
+          "count": 1,
+          "interval": 1
+        }
+      ]
+    },
+    {
+      "time": 166,
+      "spawns": [
+        {
+          "enemy": "caster_elite",
+          "door": 1,
+          "targetBlueDoor": 1,
+          "count": 1,
+          "interval": 1
+        }
+      ]
+    },
+    {
+      "time": 167,
+      "spawns": [
+        {
+          "enemy": "caster_elite",
+          "door": 2,
+          "targetBlueDoor": 2,
+          "count": 1,
+          "interval": 1
+        }
+      ]
+    },
+    {
+      "time": 168,
+      "spawns": [
+        {
+          "enemy": "dual_swordsman",
+          "door": 0,
+          "targetBlueDoor": 1,
+          "count": 1,
+          "interval": 1
+        }
+      ]
+    },
+    {
+      "time": 169,
+      "spawns": [
+        {
+          "enemy": "dual_swordsman",
+          "door": 1,
+          "targetBlueDoor": 2,
+          "count": 1,
+          "interval": 1
+        }
+      ]
+    },
+    {
+      "time": 170,
+      "spawns": [
+        {
+          "enemy": "dual_swordsman",
+          "door": 1,
+          "targetBlueDoor": 1,
+          "count": 1,
+          "interval": 1
+        }
+      ]
+    },
+    {
+      "time": 171,
+      "spawns": [
+        {
+          "enemy": "dual_swordsman",
+          "door": 2,
+          "targetBlueDoor": 2,
+          "count": 1,
+          "interval": 1
+        }
+      ]
+    },
+    {
+      "time": 181,
+      "spawns": [
+        {
+          "enemy": "dual_swordsman",
+          "door": 1,
+          "targetBlueDoor": 1,
+          "count": 3,
+          "interval": 13
+        }
+      ]
+    },
+    {
+      "time": 182,
+      "spawns": [
+        {
+          "enemy": "caster_elite",
+          "door": 1,
+          "targetBlueDoor": 2,
+          "count": 3,
+          "interval": 10
+        }
+      ]
+    },
+    {
+      "time": 183,
+      "spawns": [
+        {
+          "enemy": "berserk_leader",
+          "door": 2,
+          "targetBlueDoor": 2,
+          "count": 2,
+          "interval": 10
+        }
+      ]
+    }
+  ]
+}

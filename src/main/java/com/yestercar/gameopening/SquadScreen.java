@@ -196,9 +196,16 @@ final class SquadScreen {
     }
 
     void clearSelection() {
-        System.out.println("[探针] clearSelection 清空前槽位=" + selectedCount());
         java.util.Arrays.fill(slots, null);
         hint = "";
+        editingSlot = -1;          // 顺手关掉选人页，避免下次进来还停在这里
+        pickRowOffset = 0;
+    }
+
+    /** 关闭选人页（保留已选编队）。 */
+    void closePick() {
+        editingSlot = -1;
+        pickRowOffset = 0;
     }
 
     /**
@@ -307,13 +314,8 @@ final class SquadScreen {
             return false;
         }
 
-        // ② 点右栏列表 → 放进第一个空位
-        int row = listRowAt(mx, my);
-        if (row >= 0 && row < available.size()) {
-            if (row < pickShown.size()) {
-                putIntoNextFreeSlot(pickShown.get(row));
-            }
-        }
+        // 右栏是「关卡详情」，**只读**：点它不选干员。
+        // （之前这里会把点击当成"列表行"，导致点敌人图标就自动塞人进编队。）
         return false;
     }
 

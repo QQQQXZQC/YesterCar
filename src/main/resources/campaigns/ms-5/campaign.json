@@ -1,0 +1,406 @@
+{
+  "version": 1,
+  "id": "ms-5",
+  "name": "狭路",
+  "author": "尘辙",
+  "description": "荒野上的旧营地：大批猎狗与幽灵游荡其间，一个被称作大鲍勃的人承包了这处据点，每个人都有自己的路，你选择你的，她选择她的，只是有一些人的路比其他人要艰难得多，不过无论如何，总是殊途同归的。",
+  "map": "map/ms-5.json",
+  "initialCost": 10,
+  "costPerSecond": 1,
+  "life": 3,
+  "obstacleCost": 3,
+  "obstacleHp": 100,
+  "obstacleBlock": 30,
+  "obstacleCount": 0,
+  "obstacleRedeployTime": 5,
+  "waves": [
+    {
+      "time": 10,
+      "spawns": [
+        {
+          "enemy": "soldier",
+          "door": 4,
+          "targetBlueDoor": 1,
+          "count": 1,
+          "interval": 1
+        },
+        {
+          "enemy": "soldier",
+          "door": 5,
+          "targetBlueDoor": 1,
+          "count": 1,
+          "interval": 1
+        },
+        {
+          "enemy": "soldier",
+          "door": 6,
+          "targetBlueDoor": 1,
+          "count": 1,
+          "interval": 1
+        }
+      ]
+    },
+    {
+      "time": 18,
+      "spawns": [
+        {
+          "enemy": "soldier",
+          "door": 2,
+          "targetBlueDoor": 2,
+          "count": 2,
+          "interval": 1
+        }
+      ]
+    },
+    {
+      "time": 25,
+      "spawns": [
+        {
+          "enemy": "soldier",
+          "door": 2,
+          "targetBlueDoor": 2,
+          "count": 2,
+          "interval": 1
+        }
+      ]
+    },
+    {
+      "time": 26,
+      "spawns": [
+        {
+          "enemy": "phantom",
+          "door": 2,
+          "targetBlueDoor": 2,
+          "count": 1,
+          "interval": 1
+        }
+      ]
+    },
+    {
+      "time": 39,
+      "spawns": [
+        {
+          "enemy": "soldier",
+          "door": 3,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1
+        }
+      ]
+    },
+    {
+      "time": 47,
+      "spawns": [
+        {
+          "enemy": "soldier",
+          "door": 3,
+          "targetBlueDoor": 0,
+          "count": 2,
+          "interval": 1.5
+        }
+      ]
+    },
+    {
+      "time": 51,
+      "spawns": [
+        {
+          "enemy": "soldier",
+          "door": 2,
+          "targetBlueDoor": 2,
+          "count": 2,
+          "interval": 1.3
+        }
+      ]
+    },
+    {
+      "time": 55,
+      "spawns": [
+        {
+          "enemy": "soldier",
+          "door": 3,
+          "targetBlueDoor": 0,
+          "count": 2,
+          "interval": 1.5
+        }
+      ]
+    },
+    {
+      "time": 58,
+      "spawns": [
+        {
+          "enemy": "phantom",
+          "door": 3,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1
+        },
+        {
+          "enemy": "soldier",
+          "door": 2,
+          "targetBlueDoor": 2,
+          "count": 2,
+          "interval": 1.3
+        }
+      ]
+    },
+    {
+      "time": 72.3,
+      "spawns": [
+        {
+          "enemy": "hound_pro",
+          "door": 3,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1
+        }
+      ]
+    },
+    {
+      "time": 75.3,
+      "spawns": [
+        {
+          "enemy": "hound_pro",
+          "door": 2,
+          "targetBlueDoor": 2,
+          "count": 1,
+          "interval": 1
+        }
+      ]
+    },
+    {
+      "time": 77.3,
+      "spawns": [
+        {
+          "enemy": "hound_pro",
+          "door": 3,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1
+        }
+      ]
+    },
+    {
+      "time": 84.3,
+      "spawns": [
+        {
+          "enemy": "hound_pro",
+          "door": 2,
+          "targetBlueDoor": 2,
+          "count": 1,
+          "interval": 1
+        }
+      ]
+    },
+    {
+      "time": 87.3,
+      "spawns": [
+        {
+          "enemy": "hound_pro",
+          "door": 3,
+          "targetBlueDoor": 0,
+          "count": 2,
+          "interval": 1.3
+        }
+      ]
+    },
+    {
+      "time": 90,
+      "spawns": [
+        {
+          "enemy": "big_bob",
+          "door": 5,
+          "targetBlueDoor": 1,
+          "count": 1,
+          "interval": 1
+        }
+      ]
+    },
+    {
+      "time": 91.3,
+      "spawns": [
+        {
+          "enemy": "hound_pro",
+          "door": 2,
+          "targetBlueDoor": 2,
+          "count": 2,
+          "interval": 1.5
+        }
+      ]
+    },
+    {
+      "time": 97.3,
+      "spawns": [
+        {
+          "enemy": "hound_pro",
+          "door": 3,
+          "targetBlueDoor": 0,
+          "count": 2,
+          "interval": 1.3
+        }
+      ]
+    },
+    {
+      "time": 99.3,
+      "spawns": [
+        {
+          "enemy": "hound_pro",
+          "door": 2,
+          "targetBlueDoor": 2,
+          "count": 2,
+          "interval": 1.5
+        }
+      ]
+    },
+    {
+      "time": 104.3,
+      "spawns": [
+        {
+          "enemy": "phantom",
+          "door": 3,
+          "targetBlueDoor": 0,
+          "count": 2,
+          "interval": 3
+        }
+      ]
+    },
+    {
+      "time": 109.3,
+      "spawns": [
+        {
+          "enemy": "phantom",
+          "door": 2,
+          "targetBlueDoor": 2,
+          "count": 2,
+          "interval": 6
+        }
+      ]
+    },
+    {
+      "time": 130.3,
+      "spawns": [
+        {
+          "enemy": "soldier",
+          "door": 3,
+          "targetBlueDoor": 0,
+          "count": 7,
+          "interval": 6
+        }
+      ]
+    },
+    {
+      "time": 131.3,
+      "spawns": [
+        {
+          "enemy": "hound_pro",
+          "door": 3,
+          "targetBlueDoor": 0,
+          "count": 7,
+          "interval": 6
+        }
+      ]
+    },
+    {
+      "time": 132.3,
+      "spawns": [
+        {
+          "enemy": "soldier",
+          "door": 3,
+          "targetBlueDoor": 0,
+          "count": 7,
+          "interval": 6
+        }
+      ]
+    },
+    {
+      "time": 142.3,
+      "spawns": [
+        {
+          "enemy": "hound_pro",
+          "door": 2,
+          "targetBlueDoor": 2,
+          "count": 5,
+          "interval": 8
+        }
+      ]
+    },
+    {
+      "time": 143.3,
+      "spawns": [
+        {
+          "enemy": "soldier",
+          "door": 2,
+          "targetBlueDoor": 2,
+          "count": 5,
+          "interval": 8
+        }
+      ]
+    },
+    {
+      "time": 186.3,
+      "spawns": [
+        {
+          "enemy": "phantom",
+          "door": 3,
+          "targetBlueDoor": 0,
+          "count": 4,
+          "interval": 12
+        },
+        {
+          "enemy": "phantom",
+          "door": 2,
+          "targetBlueDoor": 2,
+          "count": 4,
+          "interval": 16
+        }
+      ]
+    },
+    {
+      "time": 189.3,
+      "spawns": [
+        {
+          "enemy": "hound_pro",
+          "door": 3,
+          "targetBlueDoor": 0,
+          "count": 4,
+          "interval": 10
+        }
+      ]
+    },
+    {
+      "time": 191.3,
+      "spawns": [
+        {
+          "enemy": "hound_pro",
+          "door": 3,
+          "targetBlueDoor": 0,
+          "count": 4,
+          "interval": 10
+        }
+      ]
+    },
+    {
+      "time": 193.3,
+      "spawns": [
+        {
+          "enemy": "phantom",
+          "door": 2,
+          "targetBlueDoor": 2,
+          "count": 4,
+          "interval": 16
+        }
+      ]
+    },
+    {
+      "time": 249.3,
+      "spawns": [
+        {
+          "enemy": "originium_slug",
+          "door": 0,
+          "targetBlueDoor": 1,
+          "count": 2,
+          "interval": 9
+        }
+      ]
+    }
+  ]
+}

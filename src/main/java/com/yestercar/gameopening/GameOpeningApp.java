@@ -471,13 +471,15 @@ public class GameOpeningApp extends PApplet {
      */
     private AudioTrack battleMusicFor(String campaignId) {
         String id = campaignId == null ? "" : campaignId;
-        if (id.endsWith("official_05")) {
+        // ⚠️ 关卡 id 已从 official_0N 改成 ms-N，两套都要认（旧存档/旧引用兜底）
+        if (id.endsWith("ms-5") || id.endsWith("official_05")) {
             return boss1Bgm;
         }
-        if (id.endsWith("official_08")) {
+        if (id.endsWith("ms-8") || id.endsWith("official_08")) {
             return boss2Bgm;
         }
-        if (id.endsWith("official_06") || id.endsWith("official_07")) {
+        if (id.endsWith("ms-6") || id.endsWith("ms-7")
+                || id.endsWith("official_06") || id.endsWith("official_07")) {
             return battle2Bgm;
         }
         return battle1Bgm;
@@ -1226,8 +1228,20 @@ public class GameOpeningApp extends PApplet {
                     .comparingInt(com.yestercar.common.model.Operator::cost)
                     .thenComparing(com.yestercar.common.model.Operator::id));
             java.util.List<String> ids = new java.util.ArrayList<>();
-            for (int i = 0; i < Math.min(4, all.size()); i++) {
-                ids.add(all.get(i).id());
+            // 诊断：-Dyestercar.ui.squad=texas,surtr 指定编队（做"每个干员的局内效果"截图用）
+            String squadOverride = System.getProperty("yestercar.ui.squad");
+            if (squadOverride != null && !squadOverride.isBlank()) {
+                for (String raw : squadOverride.split(",")) {
+                    String id = raw.trim();
+                    if (!id.isEmpty()) {
+                        ids.add(id);
+                    }
+                }
+                System.out.println("[GameMain] --play 编队（-Dyestercar.ui.squad）: " + ids);
+            } else {
+                for (int i = 0; i < Math.min(4, all.size()); i++) {
+                    ids.add(all.get(i).id());
+                }
             }
             launchBattle(bootBattle, ids);
         }

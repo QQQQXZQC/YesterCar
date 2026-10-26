@@ -58,8 +58,10 @@ class OperatorTest {
         Map<String, Operator> all = Operator.loadAll();
         int min = all.values().stream().mapToInt(Operator::cost).min().orElse(0);
         int max = all.values().stream().mapToInt(Operator::cost).max().orElse(0);
-        assertTrue(min <= 8, "最低费用应当 ≤ 8，实际 " + min);
-        assertTrue(max >= 20, "最高费用应当 ≥ 20，实际 " + max);
+        // 数值按官方"精英2满级"填写：最便宜的是桃金娘 10 费，最贵的是夕/莫斯提马 34 费。
+        // 这条只守"区间足够宽"（有低费先锋，也有高费法师），不钉具体数字。
+        assertTrue(min <= 10, "最低费用应当 ≤ 10，实际 " + min);
+        assertTrue(max >= 30, "最高费用应当 ≥ 30，实际 " + max);
     }
 
     @Test

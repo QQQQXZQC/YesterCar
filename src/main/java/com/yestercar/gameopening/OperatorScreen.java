@@ -303,7 +303,7 @@ final class OperatorScreen {
         };
         float y = sy;
         for (String[] row : rows) {
-            PImage icon = load("data/imgs/人物属性/" + row[0] + ".png");
+            PImage icon = load(com.yestercar.common.util.AssetPaths.attributeIcon(row[0]));
             if (icon != null) {
                 g.imageMode(PConstants.CORNER);
                 g.image(icon, d.x(sx), d.y(y), d.w(34f), d.h(34f));
@@ -316,6 +316,34 @@ final class OperatorScreen {
             g.fill(UITheme.MENU_TEXT);
             fonts.text(g, row[1], d.x(sx + 230f), d.y(y + 17f));
             y += 56f;
+        }
+
+        // 特性说明：小标题用特性的名字（不写“特性”二字），数据来自 data/traits.json
+        String traitName = com.yestercar.common.model.TraitTable.nameOf(op.id());
+        String desc = com.yestercar.common.model.TraitTable.descriptionOf(op.id());
+        if (desc != null && traitName != null) {
+            y += 6f;
+            fonts.apply(g, Fonts.Role.COMMAND, 20f);
+            g.textAlign(PConstants.LEFT, PConstants.TOP);
+            g.fill(UITheme.MENU_TEXT, 0.7f * 255f);
+            fonts.text(g, traitName, d.x(sx), d.y(y));
+            y += 38f;
+            fonts.apply(g, Fonts.Role.SANS, 18f);
+            g.fill(UITheme.MENU_TEXT, 0.88f * 255f);
+            float maxW = d.w(330f);
+            StringBuilder line = new StringBuilder();
+            for (int i = 0; i < desc.length(); i++) {
+                char ch = desc.charAt(i);
+                if (line.length() > 0 && g.textWidth(line.toString() + ch) > maxW) {
+                    fonts.text(g, line.toString(), d.x(sx), d.y(y));
+                    y += 30f;
+                    line.setLength(0);
+                }
+                line.append(ch);
+            }
+            if (line.length() > 0) {
+                fonts.text(g, line.toString(), d.x(sx), d.y(y));
+            }
         }
     }
 

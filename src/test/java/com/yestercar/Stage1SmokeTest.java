@@ -395,8 +395,8 @@ class Stage1SmokeTest {
         List<String> campaigns = Workspace.listResourceChildren(
                 Workspace.CAMPAIGNS_RESOURCE_DIR);
 
-        assertTrue(campaigns.contains("official_01"), "应列出 official_01，实际: " + campaigns);
-        assertTrue(campaigns.contains("official_02"), "应列出 official_02，实际: " + campaigns);
+        assertTrue(campaigns.contains("ms-1"), "应列出 ms-1，实际: " + campaigns);
+        assertTrue(campaigns.contains("ms-2"), "应列出 ms-2，实际: " + campaigns);
 
         // 关键反例：同目录下的 index.json 是「文件」，不能被当成子目录列出来。
         // 列目录的实现若偷懒做字符串前缀匹配，这里就会挂。
@@ -404,16 +404,16 @@ class Stage1SmokeTest {
                 "文件不应出现在子目录列表中，实际: " + campaigns);
 
         // 逐层列举：jar 内的前缀匹配容易被更深的路径骗到，专门验证下一层。
-        // official_01 下有 maps/ 与 levels/ 两个子目录 —— 断言"恰好这两个"，
+        // ms-1 下有 maps/ 与 levels/ 两个子目录 —— 断言"恰好这两个"，
         // 既验证直接子目录都列得出，也验证**不会把更深的路径混进来**
         // （比如里面的 .json 文件、或 map/ 自身的深层内容）。
-        // official_01 下只有 map 一个子目录（单数）——
+        // ms-1 下只有 map 一个子目录（单数）——
         // 「一个战役 = 一张地图」，不该再有 levels 那一层
-        List<String> under01 = Workspace.listResourceChildren("campaigns/official_01");
+        List<String> under01 = Workspace.listResourceChildren("campaigns/ms-1");
         assertEquals(List.of("map"), under01,
                 "战役目录下只应有 map（单数），实际: " + under01);
 
-        assertTrue(Workspace.listResourceChildren("campaigns/official_01/maps").isEmpty(),
+        assertTrue(Workspace.listResourceChildren("campaigns/ms-1/maps").isEmpty(),
                 "maps 下只有文件，没有子目录");
     }
 
@@ -432,7 +432,7 @@ class Stage1SmokeTest {
     void 两组资源_API_不串味() throws IOException {
         // campaigns/ 与 data/ 平级，必须用 readClasspathResourceAsString（不加 data/ 前缀）
         String index = Workspace.readClasspathResourceAsString("campaigns/index.json");
-        assertTrue(index.contains("official_01"), "索引内容不符: " + index);
+        assertTrue(index.contains("ms-1"), "索引内容不符: " + index);
 
         // data/ 组仍按原来的相对路径工作
         assertTrue(Workspace.readResourceAsString("enemies.json").contains("soldier"),

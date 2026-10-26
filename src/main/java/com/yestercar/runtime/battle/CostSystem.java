@@ -96,13 +96,38 @@ final class CostSystem {
     }
 
     /**
+     * 额外回费（角色特性效果，例如桃金娘部署后每秒 +2）。
+     *
+     * <p>和 {@link #refund(int)} 分开：返还是把花掉的还回去，这里是真正"生成"费用。
+     *
+     * @param amount 金额（可以是小数，按累积生效）
+     */
+    void gain(float amount) {
+        if (amount <= 0f) {
+            return;
+        }
+        cost = Math.min(cap, cost + amount);
+    }
+
+    /**
      * 返还（撤退）。
      *
      * @param spentCost 当初部署花费的费用
      * @return 实际返还的金额（{@code floor(spent × 50%)}）
      */
     int refund(int spentCost) {
-        int back = (int) Math.floor(Math.max(0, spentCost) * REFUND_RATIO);
+        return refund(spentCost, REFUND_RATIO);
+    }
+
+    /**
+     * 按指定比例返还（角色特性可能把比例改成 100%，例如风笛的"军事传统"）。
+     *
+     * @param spentCost 当初部署花费的费用
+     * @param ratio     返还比例（0–1）
+     * @return 实际返还的金额
+     */
+    int refund(int spentCost, float ratio) {
+        int back = (int) Math.floor(Math.max(0, spentCost) * Math.max(0f, Math.min(1f, ratio)));
         cost = Math.min(cap, cost + back);
         return back;
     }

@@ -211,11 +211,22 @@ final class DeploymentSystem {
      * @return 实际返还的费用
      */
     int retreat(OperatorUnit unit) {
+        return retreat(unit, CostSystem.REFUND_RATIO);
+    }
+
+    /**
+     * 按指定比例返还的撤退（角色特性可以把比例改成 100%，例如风笛的"军事传统"）。
+     *
+     * @param unit  要撤退的干员
+     * @param ratio 返还比例（0–1）
+     * @return 实际返还的费用
+     */
+    int retreat(OperatorUnit unit, float ratio) {
         if (unit == null || !deployed.remove(unit)) {
             return 0;
         }
-        int back = cost.refund(unit.type().cost());
-        cooldown.put(unit.type().id(), (float) unit.type().redeployTime());
+        int back = cost.refund(unit.type().cost(), ratio);
+        cooldown.put(unit.type().id(), effectiveRedeployTime(unit));
         return back;
     }
 
@@ -231,7 +242,18 @@ final class DeploymentSystem {
             return;
         }
         deployed.remove(unit);
-        cooldown.put(unit.type().id(), (float) unit.type().redeployTime());
+        cooldown.put(unit.type().id(), effectiveRedeployTime(unit));
+    }
+
+    /**
+     * 该干员实际要等的再部署时间：角色特性可以改（伊内丝的"影织" → 15 秒）。
+     *
+     * @param unit 干员
+     * @return 秒数
+     */
+    private static float effectiveRedeployTime(OperatorUnit unit) {
+        return com.yestercar.common.model.TraitTable.redeployTimeOf(
+                unit.type().id(), (float) unit.type().redeployTime());
     }
 
     /**

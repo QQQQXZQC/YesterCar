@@ -26,14 +26,15 @@ import java.util.Map;
  * @param attackInterval   攻击间隔（秒）
  * @param blockWeight      阻挡占位（1 = 占一个阻挡位）
  * @param isRanged         是否远程
- * @param rangeRadius      远程攻击半径（格，切比雪夫距离；0 = 近战）
+ * @param rangeRadius      远程攻击半径（格；官方"攻击范围半径"，可以是小数，如高阶术师 2.2；
+ *                         0 = 近战）。{@code enemy_ranges.json} 里配了格子表时优先用格子表
  * @param taunt            嘲讽值（越大越容易被干员优先选中；缺省 0）
  * @param res              法术抗性（0–100，百分数；法术伤害按 {@code ×(1−res/100)} 结算）
  * @param icon             图标路径（{@code data/imgs/enemy/xxx.png}，可为空）
  */
 public record EnemyType(String id, String name, int hp, int atk, int def,
                         float speed, float attackInterval, int blockWeight,
-                        boolean isRanged, int rangeRadius, int taunt,
+                        boolean isRanged, float rangeRadius, int taunt,
                         int res, String icon, String damageType) {
 
     /** 敌人攻击范围表（id → 朝右的格偏移）；与 operators.json 的 range 结构一致。 */
@@ -47,6 +48,33 @@ public record EnemyType(String id, String name, int hp, int atk, int def,
      */
     public java.util.List<int[]> rangeCells() {
         return RANGES.getOrDefault(id, java.util.List.of());
+    }
+
+    /**
+     * 按**朝向**取得攻击范围（表里只写了朝右的一套，其余方向在这里旋转出来）。
+     *
+     * <p>旋转规则与干员一致：{@code right} 那一套的 x 是"前方"、y 是"侧向"。
+     *
+     * @param facing 朝向（{@code null} 当作朝右）
+     * @return 格子偏移列表（{@code {dx, dy}}）
+     */
+    public java.util.List<int[]> rangeCells(com.yestercar.common.util.Director facing) {
+        java.util.List<int[]> base = rangeCells();
+        if (facing == null || facing == com.yestercar.common.util.Director.RIGHT) {
+            return base;
+        }
+        java.util.List<int[]> out = new java.util.ArrayList<>(base.size());
+        for (int[] c : base) {
+            int x = c[0];
+            int y = c[1];
+            switch (facing) {
+                case LEFT -> out.add(new int[] {-x, y});
+                case UP -> out.add(new int[] {y, -x});
+                case DOWN -> out.add(new int[] {-y, x});
+                default -> out.add(new int[] {x, y});
+            }
+        }
+        return out;
     }
 
     /** 首次访问时读 {@code data/enemy_ranges.json}（用 Processing 自带的 JSONObject）。 */
@@ -178,7 +206,7 @@ public record EnemyType(String id, String name, int hp, int atk, int def,
                         Math.max(0.01f, Float.parseFloat(c[7].trim())),
                         Math.max(0, Integer.parseInt(c[8].trim())),   // 0 = 不可阻挡
                         "1".equals(c[9].trim()),
-                        Math.max(0, Integer.parseInt(c[10].trim())),
+                        Math.max(0f, Float.parseFloat(c[10].trim())),
                         Integer.parseInt(c[11].trim()),
                         Math.max(0, Math.min(100, Integer.parseInt(c[5].trim()))),
                         c.length > 12 && !c[12].isBlank() ? c[12].trim() : null,

@@ -30,10 +30,10 @@ final class AkuiAssets {
     }
 
     /** 资源根目录（相对工程根）。**全仓只此一处**。 */
-    static final String ROOT = "data/imgs/akui/";
+    static final String ROOT = "data/imgs/Main/";
 
     /** 整屏背景（cover 铺满）。 */
-    static final String BG = ROOT + "bg-terminal-rooftop.png";
+    static final String BG = ROOT + "MainBack.png";
 
     /** 角色立绘（底部居中，不裁头）。 */
     static final String CHARACTER = ROOT + "char_anjielina.png";

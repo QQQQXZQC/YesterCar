@@ -1352,6 +1352,10 @@ final class MainMenu {
 
     private void goScreen(Screen next) {
         boolean fromMenu = screen == Screen.MENU;
+        // 离开编队页：关掉选人页（否则下次进来还停在选人界面）
+        if (screen == Screen.SQUAD && next != Screen.SQUAD && squadScreen != null) {
+            squadScreen.closePick();
+        }
         // 战役界面（编队/关卡列表）用专属配乐，主菜单用主菜单曲
         // 战役相关界面（官方/自定义列表、编队）统一放 Broken_Sun；
         // 只有回到主菜单才换回 fudahuang。
@@ -1369,8 +1373,10 @@ final class MainMenu {
                 // MENU / CUSTOM：fudahuang。
                 // 从编队返回列表时要**从头**放 —— 否则会接着离开时的那一段继续，
                 // 听起来像"上次没放完"，日志里表现为直接 play 而不是重新开始。
+                // 主菜单 → 自定义关卡 / 干员页：**接着放**（不重头）
+                // 只有从编队返回列表时才重头
                 boolean fromSquad = screen == Screen.SQUAD;
-                host.switchCampaignMusic(false, fromMenu || fromSquad);
+                host.switchCampaignMusic(false, fromSquad);
             }
         }
         screen = next;

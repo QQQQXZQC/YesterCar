@@ -1,0 +1,286 @@
+{
+  "version": 1,
+  "id": "ms-3",
+  "name": "暴君",
+  "author": "尘辙",
+  "description": "敌方持盾士兵拥有较高防御力，请部署术师干员进行击破。",
+  "map": "map/ms-3.json",
+  "initialCost": 10,
+  "costPerSecond": 1.0,
+  "life": 10,
+  "obstacleCost": 3,
+  "obstacleHp": 100,
+  "obstacleBlock": 30,
+  "obstacleCount": 0,
+  "obstacleRedeployTime": 5,
+  "waves": [
+    {
+      "time": 6.0,
+      "spawns": [
+        {
+          "enemy": "originium_slug",
+          "door": 2,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 12.0,
+      "spawns": [
+        {
+          "enemy": "originium_slug",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 2,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 18.0,
+      "spawns": [
+        {
+          "enemy": "originium_slug",
+          "door": 1,
+          "targetBlueDoor": 0,
+          "count": 2,
+          "interval": 5.0
+        }
+      ]
+    },
+    {
+      "time": 19.0,
+      "spawns": [
+        {
+          "enemy": "originium_slug",
+          "door": 1,
+          "targetBlueDoor": 0,
+          "count": 2,
+          "interval": 5.0
+        }
+      ]
+    },
+    {
+      "time": 32.0,
+      "spawns": [
+        {
+          "enemy": "hound_pro",
+          "door": 2,
+          "targetBlueDoor": 0,
+          "count": 2,
+          "interval": 7.0
+        }
+      ]
+    },
+    {
+      "time": 35.0,
+      "spawns": [
+        {
+          "enemy": "soldier",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 2,
+          "interval": 7.0
+        }
+      ]
+    },
+    {
+      "time": 50.0,
+      "spawns": [
+        {
+          "enemy": "phantom",
+          "door": 2,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1.0
+        },
+        {
+          "enemy": "phantom",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 53.0,
+      "spawns": [
+        {
+          "enemy": "soldier",
+          "door": 1,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 56.0,
+      "spawns": [
+        {
+          "enemy": "soldier",
+          "door": 1,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 65.0,
+      "spawns": [
+        {
+          "enemy": "hound_pro",
+          "door": 2,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1.0
+        },
+        {
+          "enemy": "hound_pro",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 7.0
+        }
+      ]
+    },
+    {
+      "time": 71.0,
+      "spawns": [
+        {
+          "enemy": "soldier",
+          "door": 2,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1.0
+        },
+        {
+          "enemy": "dual_swordsman",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 7.0
+        }
+      ]
+    },
+    {
+      "time": 75.0,
+      "spawns": [
+        {
+          "enemy": "originium_slug",
+          "door": 1,
+          "targetBlueDoor": 0,
+          "count": 5,
+          "interval": 2.0
+        }
+      ]
+    },
+    {
+      "time": 76.0,
+      "spawns": [
+        {
+          "enemy": "originium_slug",
+          "door": 1,
+          "targetBlueDoor": 0,
+          "count": 5,
+          "interval": 2.0
+        }
+      ]
+    },
+    {
+      "time": 86.0,
+      "spawns": [
+        {
+          "enemy": "soldier",
+          "door": 2,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 87.0,
+      "spawns": [
+        {
+          "enemy": "soldier",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 94.0,
+      "spawns": [
+        {
+          "enemy": "phantom",
+          "door": 2,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 5.0
+        },
+        {
+          "enemy": "phantom",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 5.0
+        }
+      ]
+    },
+    {
+      "time": 99.0,
+      "spawns": [
+        {
+          "enemy": "heavy_defender",
+          "door": 1,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 6.0
+        }
+      ]
+    },
+    {
+      "time": 107.0,
+      "spawns": [
+        {
+          "enemy": "originium_slug",
+          "door": 0,
+          "targetBlueDoor": 0,
+          "count": 3,
+          "interval": 1.0
+        }
+      ]
+    },
+    {
+      "time": 108.0,
+      "spawns": [
+        {
+          "enemy": "heavy_defender",
+          "door": 1,
+          "targetBlueDoor": 0,
+          "count": 1,
+          "interval": 6.0
+        }
+      ]
+    },
+    {
+      "time": 116.0,
+      "spawns": [
+        {
+          "enemy": "originium_slug",
+          "door": 2,
+          "targetBlueDoor": 0,
+          "count": 3,
+          "interval": 1.0
+        }
+      ]
+    }
+  ]
+}

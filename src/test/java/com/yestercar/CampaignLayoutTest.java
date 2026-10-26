@@ -223,12 +223,12 @@ class CampaignLayoutTest {
     @DisplayName("官方战役的显示名允许与 id 不同（含全角冒号，不能当文件名）")
     void 官方显示名可以含非法文件名字符() {
         Campaign c1 = CampaignLoader.loadOfficial().stream()
-                .filter(c -> c.id().equals("official_01"))
+                .filter(c -> c.id().equals("ms-1"))
                 .findFirst().orElse(null);
-        assertNotNull(c1, "应当有 official_01");
+        assertNotNull(c1, "应当有 ms-1");
 
-        assertEquals("official_01", c1.id(), "id 必须是合法目录名");
-        // 显示名与目录名解耦：现在官方关卡叫 MS-1，id 仍是 official_01
+        assertEquals("ms-1", c1.id(), "id 必须是合法目录名");
+        // 显示名与目录名解耦：现在官方关卡叫 MS-1，id 仍是 ms-1
         assertNotEquals(c1.id(), c1.name(),
                 "显示名可以与 id 不同，实际: " + c1.name());
         assertFalse(CampaignMeta.mapPathFor(c1.id()).contains("："),

@@ -36,8 +36,21 @@ public final class TileMap {
      */
     public static final int MAX_SIZE = 15;
 
-    /** 行数上限（编辑器画布最多 8 行）。 */
-    public static final int MAX_ROWS = 8;
+    /**
+     * 行数上限。
+     *
+     * <p>原来是 8；ms-4（4-4）的官方地图是 13×9，行数放不下，所以提到 **9** ——
+     * 这是当前 ms-1…ms-8 里唯一超过 8 行的图，其余仍是 7～8 行。
+     */
+    public static final int MAX_ROWS = 9;
+
+    /**
+     * **新建地图**的行数上限（8）。
+     *
+     * <p>与 {@link #MAX_ROWS} 分开：加载要兼容 ms-4 的 13×9，但新做的图不必
+     * 超过 8 行 —— 需求是"新建时最多 8 行"。
+     */
+    public static final int MAX_NEW_ROWS = 8;
 
     /** 格子默认边长（像素）。 */
     public static final int DEFAULT_TILE_SIZE = 64;

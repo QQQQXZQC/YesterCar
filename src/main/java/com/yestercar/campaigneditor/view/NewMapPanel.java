@@ -341,7 +341,7 @@ public final class NewMapPanel {
 
         String[] labels = {"战役名（文件夹名，也是主菜单里显示的名字）",
                 "列数（1 ~ " + TileMap.MAX_SIZE + "）",
-                "行数（1 ~ " + TileMap.MAX_SIZE + "）"};
+                "行数（1 ~ " + TileMap.MAX_NEW_ROWS + "）"};
 
         for (int i = 0; i < FIELD_COUNT; i++) {
             float[] b = fieldBox(i);
@@ -753,9 +753,11 @@ public final class NewMapPanel {
         }
         int cols = parseInt(values[FIELD_COLS].toString());
         int rows = parseInt(values[FIELD_ROWS].toString());
-        if (cols < 1 || cols > TileMap.MAX_SIZE || rows < 1 || rows > TileMap.MAX_SIZE) {
-            error = "列/行必须是 1 ~ " + TileMap.MAX_SIZE + " 的整数";
-            focused = cols < 1 || cols > TileMap.MAX_SIZE ? FIELD_COLS : FIELD_ROWS;
+        boolean colsBad = cols < 1 || cols > TileMap.MAX_SIZE;
+        boolean rowsBad = rows < 1 || rows > TileMap.MAX_NEW_ROWS;
+        if (colsBad || rowsBad) {
+            error = "列 1 ~ " + TileMap.MAX_SIZE + "，行 1 ~ " + TileMap.MAX_NEW_ROWS;
+            focused = colsBad ? FIELD_COLS : FIELD_ROWS;
             return;
         }
         error = "";

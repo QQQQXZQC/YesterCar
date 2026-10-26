@@ -226,10 +226,12 @@ class BattleSystemsTest {
         assertEquals(DeploymentSystem.Result.COOLDOWN,
                 d.deploy(guard(), 3, 1, Director.RIGHT));
 
-        d.update(20f);
-        assertFalse(d.readyToDeploy("chen"), "陈的再部署是 22 秒，20 秒时还没好");
-        d.update(3f);
-        assertTrue(d.readyToDeploy("chen"), "23 秒后应当就绪");
+        // 冷却长度 = 该干员的再部署时间（官方值，陈是 70 秒）。用例只守语义，不钉死秒数。
+        float rdp = guard().redeployTime();
+        d.update(rdp - 3f);
+        assertFalse(d.readyToDeploy("chen"), "陈的再部署是 " + rdp + " 秒，还没到点");
+        d.update(4f);
+        assertTrue(d.readyToDeploy("chen"), (rdp + 1) + " 秒后应当就绪");
     }
 
     @Test
@@ -441,8 +443,10 @@ class BattleSystemsTest {
         assertTrue(u.tickAttack(1f), "没出手就不该进入冷却");
         // 真的出手后才进冷却
         u.markAttacked();
-        assertFalse(u.tickAttack(0.5f), "出手后 0.5 秒应当还在冷却");
-        assertTrue(u.tickAttack(0.6f), "1.1 秒后应当就绪");
+        // 冷却长度 = 该干员的攻击间隔（官方值）。这里的比例只保证"半个间隔还没好、整个间隔就好"。
+        float cd = guard().attackInterval();
+        assertFalse(u.tickAttack(cd * 0.5f), "出手后半个间隔应当还在冷却");
+        assertTrue(u.tickAttack(cd * 0.7f), "累计超过一个间隔后应当就绪");
     }
 
     // ------------------------------------------------------------------

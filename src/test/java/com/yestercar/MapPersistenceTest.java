@@ -157,17 +157,17 @@ class MapPersistenceTest {
     }
 
     @Test
-    @DisplayName("校验：门数量超过上限报错，且提示是警告不是错误")
+    @DisplayName("校验：红蓝门数量不再设上限")
     void 校验门数量上限() {
         TileMap map = filledMap(12, 8);
         map.placeRedDoor(0, 0, 0);
         map.placeRedDoor(1, 1, 0);
-        map.placeRedDoor(2, 2, 0);       // 第三道，超上限
+        map.placeRedDoor(2, 2, 0);
         map.placeBlueDoor(0, 11, 7, 3);
 
         MapValidator.ValidationResult v = MapValidator.validate(map);
-        assertFalse(v.ok());
-        assertTrue(v.errors().stream().anyMatch(e -> e.contains("红门最多")), "应报红门超上限");
+        assertTrue(v.errors().stream().noneMatch(e -> e.contains("红门最多")),
+                "门数量已不再设上限");
     }
 
     @Test

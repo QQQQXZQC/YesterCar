@@ -261,6 +261,12 @@ public final class BattleScreen {
     /** 诊断截图是否已完成。 */
     private boolean battleShotDone;
 
+    /** 诊断序列截图：已存到第几帧（{@code -1} = 还没开始）。 */
+    private int seqShotIndex = -1;
+
+    /** 诊断序列截图：下一帧的时刻（毫秒）。 */
+    private int seqShotNextMs;
+
     /** 截图时刻（毫秒）。 */
     private int shotAtMs = 4000;
 
@@ -292,6 +298,227 @@ public final class BattleScreen {
 
     /** 占位动画：死亡烟尘（x, y, 已存活秒数）。 */
     private final java.util.List<float[]> puffs = new java.util.ArrayList<>();
+
+    /**
+     * 干员**普攻特效**（远程弹体 + 近战挥砍），参数读 {@code data/attack-fx.csv}。
+     *
+     * <p>时序：引擎在出手瞬间把 {@code attackAge}（距上次出手的时间）归零，我们把它当
+     * "攻击动画进度"用 —— 先记下"刚出手"（上弦），等它涨到 {@code release}
+     * （表里那一列：近战是"挥砍打到"、远程是"离手"，都实测自 Spine 的攻击动画）时才出特效：
+     * <ul>
+     *   <li>近战（{@code kind=none}）：在目标身上扫两道月牙（Defender {@code _slash}），
+     *       **同一 tick** 引擎按这个时刻结算伤害；</li>
+     *   <li>远程（{@code arrow/bolt/orb}）：射出弹体（Defender {@code PROJ}），飞到目标处炸开，
+     *       引擎在弹体到达那一 tick 结算伤害。</li>
+     * </ul>
+     *
+     * <p>目标点：射程内离干员最近的敌人（引擎的 TargetSelector 也是"最近的优先"，
+     * 所以几乎总是同一只）；范围内没有敌人时朝面向方向打一发短的，避免"抬手没特效"。
+     *
+     * @param dt 本帧真实间隔（秒）
+     */
+    private void drawAttackFx(float dt) {
+        if (director == null || scene == null) {
+            return;
+        }
+        if (attackFx == null) {
+            attackFx = new com.yestercar.runtime.view.AttackFx();
+        }
+        // 敌方远程攻击：引擎在"弹体离手"那一 tick 把起止点交出来，这里照同一条弹道放出去
+        for (float[] shot : director.drainEnemyAttackFx()) {
+            attackFx.spawnShot("enemy", shot[0], shot[1], shot[2], shot[3]);
+            if ("1".equals(System.getProperty("yestercar.fx.debug"))) {
+                System.out.printf("[fx] enemyShot from (%.2f,%.2f) to (%.2f,%.2f)%n",
+                        shot[0], shot[1], shot[2], shot[3]);
+            }
+        }
+        java.util.List<com.yestercar.runtime.battle.BattleDirector.UnitView> views =
+                director.unitViews();
+
+        java.util.Set<String> alive = new java.util.HashSet<>();
+        for (com.yestercar.runtime.battle.BattleDirector.UnitView u : views) {
+            String cell = u.col() + "," + u.row();
+            alive.add(cell);
+            float now = u.attackAge();
+            float[] st = fxState.get(cell);
+            if (st == null) {
+                st = new float[] {now, 0f};
+                fxState.put(cell, st);
+                continue;
+            }
+            com.yestercar.common.model.Operator op = fxOperator(u.name());
+            com.yestercar.common.model.AttackFxTable.Spec spec =
+                    op == null ? null : com.yestercar.common.model.AttackFxTable.get(op.id());
+            // 医疗是治疗不是攻击（引擎走 heal 分支），不给它们画弹道
+            if (spec != null && "orb".equals(spec.kind())) {
+                spec = null;
+            }
+            float release = spec == null ? -1f : spec.release();
+            // ① 出手：attackAge 从"接近间隔"跳到 0 附近 → 上弦，并在这一刻锁定目标
+            if (now < st[0] - 0.08f) {
+                st[1] = 1f;
+                fxTarget.put(cell, nearestInFxRange(u));
+            }
+            // ② 动画播到"打到/离手"那一帧 → 出特效，并下弦（这次出手只发一次）
+            boolean fire = release >= 0f && st[1] > 0f && now >= release && now > st[0] - 0.5f;
+            st[0] = now;
+            if (!fire) {
+                continue;
+            }
+            st[1] = 0f;
+            com.yestercar.runtime.battle.Enemy aim = fxTarget.remove(cell);
+
+            float sx = u.col() + 0.5f;
+            float sy = u.row() + 0.5f;
+            float tx = aim != null ? aim.x() : sx + u.facing().dx() * 0.8f;
+            float ty = aim != null ? aim.y() : sy + u.facing().dy() * 0.8f;
+            if (!spec.melee()) {
+                // 远程：弹体从干员飞向目标（目标已死也照样打过去，观感才对）
+                attackFx.spawnShot(spec.kind(), sx, sy, tx, ty);
+                if ("1".equals(System.getProperty("yestercar.fx.debug"))) {
+                    System.out.printf("[fx] %s from %s @(%d,%d) attackAge=%.3f target=%s%n",
+                            spec.kind(), u.name(), u.col(), u.row(), now,
+                            aim == null ? "(none)" : aim.type().id());
+                }
+            }
+            // 近战：不画特效，只保留"挥砍打到那一帧才结算伤害"的时序
+        }
+        fxState.keySet().retainAll(alive);
+
+        attackFx.update(dt);
+        if (attackFx.isEmpty()) {
+            return;                     // 没有弹体/粒子就别碰矩阵与 hint（P2D 里 hint 会刷状态）
+        }
+        g.pushMatrix();
+        g.resetMatrix();
+        g.hint(PConstants.DISABLE_DEPTH_TEST);
+        attackFx.draw(g.getGraphics(), camera);
+        g.hint(PConstants.ENABLE_DEPTH_TEST);
+        g.popMatrix();
+    }
+
+    /**
+     * 在干员的**攻击范围格子**里找最近的敌人（出手那一刻调用，用来锁定目标）。
+     *
+     * <p>按范围格子而不是半径：术师是 3-1 的扇形，按半径会把背后的敌人也算进来，
+     * 法球就会往回飞。
+     *
+     * @param u 干员快照
+     * @return 最近的敌人；范围内没有返回 {@code null}
+     */
+    private com.yestercar.runtime.battle.Enemy nearestInFxRange(
+            com.yestercar.runtime.battle.BattleDirector.UnitView u) {
+        if (scene == null) {
+            return null;
+        }
+        java.util.Set<com.yestercar.common.model.CellOffset> cells =
+                fxRangeCells(u.name(), u.facing());
+        float sx = u.col() + 0.5f;
+        float sy = u.row() + 0.5f;
+        com.yestercar.runtime.battle.Enemy best = null;
+        float bestD = Float.MAX_VALUE;
+        for (com.yestercar.runtime.battle.Enemy e : scene.enemies()) {
+            if (!e.alive()) {
+                continue;
+            }
+            boolean inRange = cells.isEmpty()
+                    ? true                                   // 查不到范围就退化到半径
+                    : cells.contains(new com.yestercar.common.model.CellOffset(
+                            (int) Math.floor(e.x()) - u.col(),
+                            (int) Math.floor(e.y()) - u.row()));
+            if (!inRange) {
+                continue;
+            }
+            float dx = e.x() - sx;
+            float dy = e.y() - sy;
+            float d = dx * dx + dy * dy;
+            if (d < bestD && d <= 4.5f * 4.5f) {
+                bestD = d;
+                best = e;
+            }
+        }
+        return best;
+    }
+
+    /**
+     * 显示名 → 干员定义（只建一次；特效选目标与查普攻参数都用它）。
+     *
+     * @param displayName 中文显示名（{@code UnitView.name()}）
+     * @return 干员；查不到返回 {@code null}
+     */
+    private static com.yestercar.common.model.Operator fxOperator(String displayName) {
+        if (fxOpByName == null) {
+            java.util.Map<String, com.yestercar.common.model.Operator> m = new java.util.HashMap<>();
+            for (com.yestercar.common.model.Operator o
+                    : com.yestercar.common.model.Operator.loadAll().values()) {
+                m.put(o.name(), o);
+            }
+            fxOpByName = m;
+        }
+        return fxOpByName.get(displayName);
+    }
+
+    /**
+     * 取某个干员朝向 d 的攻击范围格子。
+     *
+     * @param displayName 中文显示名（{@code UnitView.name()}）
+     * @param d           朝向
+     * @return 格子偏移集合；查不到返回空集合（调用方退化成半径判定）
+     */
+    private static java.util.Set<com.yestercar.common.model.CellOffset> fxRangeCells(
+            String displayName, com.yestercar.common.util.Director d) {
+        com.yestercar.common.model.Operator op = fxOperator(displayName);
+        return op == null ? java.util.Set.of() : op.rangeFor(d);
+    }
+
+    /** 显示名 → 干员（只建一次；只在特效选目标时用）。 */
+    private static java.util.Map<String, com.yestercar.common.model.Operator> fxOpByName;
+
+    /**
+     * 干员骨骼动画层（Spine）。
+     *
+     * <p>惰性创建：第一次画干员时才建，避免没进战斗的路径也去读素材。
+     * 素材缺失/解析失败时这一层不抛异常，{@link #drawOperators} 自动退回色块占位。
+     */
+    private com.yestercar.runtime.view.SpineUnitLayer spine;
+
+    /** 普攻特效层（远程弹体 + 近战挥砍）；惰性创建，第一次画特效时才建。 */
+    private com.yestercar.runtime.view.AttackFx attackFx;
+
+    /**
+     * 每个格子的特效状态：{@code [0] = 上一帧的 attackAge}，{@code [1] = 是否已"上弦"}。
+     *
+     * <p>"上弦"= 检测到了一次新的出手（attackAge 从大跳到 0），随后等它涨到
+     * 该干员的 {@code release}（{@code data/attack-fx.csv}）才真正出特效 —— 这样弹体/月牙
+     * 正好落在**动画打到（或离手）那一帧**，而不是在出手瞬间就飞出去。
+     */
+    private final java.util.Map<String, float[]> fxState = new java.util.HashMap<>();
+
+    /**
+     * 上弦时锁定的目标（格子 → 敌人）。
+     *
+     * <p>为什么要锁：出手到离手隔了 0.6 秒，敌人以 1.0–1.9 格/秒在走，
+     * 到发射那一刻它往往已经走出射程 —— 那时再选目标就只能"朝空气打"。
+     * 所以在**出手那一帧**就选定目标，发射时朝它当时所在的位置飞（目标已死就用它倒下的位置）。
+     */
+    private final java.util.Map<String, com.yestercar.runtime.battle.Enemy> fxTarget =
+            new java.util.HashMap<>();
+
+    /**
+     * 敌人骨骼动画层（Spine）。
+     *
+     * <p>和干员层同样的惰性创建与容错：素材缺失/解析失败时这一层返回 {@code null} 动画器，
+     * {@link #drawEnemy} 自动退回原来的色块占位。
+     */
+    private com.yestercar.runtime.view.SpineEnemyLayer enemySpine;
+
+    /**
+     * 本帧的事件快照（只 drain 一次，敌人层与干员层共用）。
+     *
+     * <p>事件是"一次取走就没了"的队列，而这一帧有两层要看它，
+     * 所以在画敌人那一步统一 {@code drainEvents()} 存到这里。
+     */
+    private java.util.List<com.yestercar.runtime.battle.BattleEvent> frameEvents = java.util.List.of();
 
     /** 占位动画：本局累计消费的事件数（诊断用）。 */
     private int eventCount;
@@ -567,7 +794,10 @@ public final class BattleScreen {
         if (director != null) {
             director.setSpawnProgress(spawned, spawnLimit);
         }
-        if (spawnManager != null) {
+        // ⚠️ 暂停时必须连**出怪队列**一起冻结：
+        //    之前只挡了 director.update，spawnManager 仍按 dt 推进，
+        //    导致暂停期间积压的敌人一次性吐出、互相重叠。
+        if (spawnManager != null && !paused) {
             spawnManager.update(dt);
             for (com.yestercar.common.model.Wave.EnemySpawn sp : spawnManager.drainDue()) {
                 spawnFromWave(sp);
@@ -665,9 +895,26 @@ public final class BattleScreen {
         }
 
         // ---- 画敌人（透视投影 → 近大远小）----
+        // 事件流**每帧只 drain 一次**：敌人层与干员层读同一份快照。
+        // （以前只有 drawOperators 在 drain；现在敌人也要用 DIE 事件补尸体，
+        //   所以挪到这里统一下发，drawOperators 直接用 frameEvents。）
+        frameEvents = director == null
+                ? java.util.List.of()
+                : director.drainEvents();
+        if (enemySpine == null && scene != null) {
+            enemySpine = new com.yestercar.runtime.view.SpineEnemyLayer(g);
+        }
+        if (enemySpine != null) {
+            enemySpine.update(dt, scene.enemies(), frameEvents);
+            // 尸体先画：人已经倒下，被活人盖住才合理
+            for (com.yestercar.runtime.view.EnemyAnimator corpse : enemySpine.corpses()) {
+                drawEnemyCorpse(corpse);
+            }
+        }
         for (Enemy e : scene.enemies()) {
             drawEnemy(e);
         }
+        pruneEnemyFx(scene.enemies());
 
         // ---- 画死亡烟尘（占位动画）----
         // ⚠️ 只能复用本帧的 dt，**绝不能第二次调 computeDeltaSeconds()** ——
@@ -677,7 +924,9 @@ public final class BattleScreen {
 
         // ---- 画干员（阶段 6）----
         if (!"1".equals(System.getProperty("yestercar.ui.noopdraw"))) {
-            drawOperators();
+            drawOperators(dt);
+            // 普攻特效：画在干员之后（弹体要盖在人身上），屏幕空间、关深度测试
+            drawAttackFx(dt);
         }
 
         // 选朝向阶段：黄框覆盖攻击范围
@@ -730,14 +979,23 @@ public final class BattleScreen {
     }
 
     /**
-     * 画干员：色块 + 朝向箭头 + 血条 + 阻挡数。
+     * 画干员：**骨骼动画** + 血条 + 阻挡数（素材缺失时退回色块）。
      *
-     * <p>本轮不接立绘贴图（那是 P5.2），先用色块 —— 策划 §1.3 明确
-     * "贴图存在则用，不存在则色块"，现在没有干员贴图，所以走色块分支。
+     * <h2>两套分支为什么都要留</h2>
+     * 策划 §1.3 的规矩是"贴图存在则用，不存在则色块"，骨骼素材同理：
+     * 美术只交一部分干员时，缺的那些必须还能正常跑、正常玩 ——
+     * 所以 {@link com.yestercar.runtime.view.SpineUnitLayer} 拿不到模型时返回 {@code null}，
+     * 这里就退回原来的色块 + 朝向箭头。
+     *
+     * @param dt 本帧真实间隔（秒）。骨骼动画按真实时间推进，与 1/30 秒固定步长的
+     *           战斗逻辑解耦 —— 这正是"动画只在表现层"的含义
      */
-    private void drawOperators() {
+    private void drawOperators(float dt) {
         if (director == null) {
             return;
+        }
+        if (spine == null) {
+            spine = new com.yestercar.runtime.view.SpineUnitLayer(g);
         }
         float[] p = new float[4];
         // ⚠️ 必须自己成对 push/pop：renderer 画完地形后矩阵状态不保证是单位阵，
@@ -747,13 +1005,35 @@ public final class BattleScreen {
         // 关深度测试：高台上的干员会和高台自身的侧面抢深度，实测被完全挡住。
         // 原型阶段"单位始终可见"比"正确遮挡"更重要（也更好操作）。
         g.hint(PConstants.DISABLE_DEPTH_TEST);
-        for (com.yestercar.runtime.battle.BattleDirector.UnitView u : director.unitViews()) {
+
+        java.util.List<com.yestercar.runtime.battle.BattleDirector.UnitView> views =
+                director.unitViews();
+        // 骨骼层**只读**事件流。事件已在画敌人那一步 drain 过（敌人也要用 DIE 补尸体），
+        // 这里直接用同一份快照 —— 事件队列"每帧只有一个消费者"的规矩不变。
+        // 阵亡单位在引擎里当 tick 就被移出快照，靠 DIE 事件的世界坐标转成"尸体"续播死亡动画。
+        spine.update(dt, views, frameEvents);
+
+        // 骨骼绘制要走 PGraphics（PApplet 只是宿主，真正的画布是 g.getGraphics()）
+        processing.core.PGraphics canvas = g.getGraphics();
+
+        // 尸体先画：人已经倒下，被活人盖住才合理
+        for (com.yestercar.runtime.view.OperatorAnimator corpse : spine.corpses()) {
+            camera.project(corpse.col() + 0.5f, corpse.row() + 0.5f,
+                    riseAt(corpse.col(), corpse.row()), p);
+            corpse.draw(canvas, p[0], p[1], p[2], 0f);
+        }
+
+        for (com.yestercar.runtime.battle.BattleDirector.UnitView u : views) {
             // ⚠️ 必须按**地形抬升高度**投影：高台干员若按 z=0 画，
             //    会被高台自身的侧面挡在下面（实测：狙击完全看不见）。
             camera.project(u.col() + 0.5f, u.row() + 0.5f,
                     riseAt(u.col(), u.row()), p);
-            float sx = p[0];
-            float sy = p[1];
+            // 脚底锚点：骨骼动画从这里往上长（未加"占位前冲"的原始位置）
+            float footX = p[0];
+            // 站到格子靠下的位置：格心 → 格底约半格，脚停在离格底 1/5 格处
+            float footY = p[1] + 0.30f * p[2];
+            float sx = footX;
+            float sy = footY;
             // ⚠️ p[2] 是"该处每格多少像素"（实测约 66），不是缩放系数。
             //    这里踩过一次：写成 `26f * p[2]` 会把干员画成 26 格宽，
             //    那块蓝色大矩形直接盖住整张地图，看起来像"地图塌成一条"。
@@ -769,31 +1049,38 @@ public final class BattleScreen {
                 lunge = k;
             }
 
-            // 描边 + 底色：地面干员蓝、高台干员紫。
-            // 高台地形贴图本身也是浅蓝，没描边会和地形糊在一起（实测）。
-            g.stroke(0xFFFFFFFF);
-            g.strokeWeight(2f);
-            // 占位动画②：受击闪白（Defender 的 hit flash 是纯表现）
-            int base = u.block() > 0 ? 0xFF2F6BDE : 0xFF8A5BE0;
-            g.fill(u.hitFlash() > 0f ? 0xFFFFFFFF : base);
-            g.rect(sx - size / 2f, sy - size, size, size, 4);
-            if (u.hitFlash() <= 0f && lunge > 0f) {
-                // 出手瞬间描一圈亮边，替代"攻击动画"
-                g.stroke(0xFFE8C15A, 200f * lunge);
+            com.yestercar.runtime.view.OperatorAnimator anim = spine.at(u.col(), u.row());
+            if (anim != null) {
+                // 骨骼动画：位置用未加"占位前冲"的脚底锚点，位移交给动画本身。
+                // 受击**不换动画**，只染色 —— 方舟骨骼里根本没有 Hit 动画。
+                anim.draw(canvas, footX, footY, p[2], u.hitFlash());
+            } else {
+                // 描边 + 底色：地面干员蓝、高台干员紫。
+                // 高台地形贴图本身也是浅蓝，没描边会和地形糊在一起（实测）。
+                g.stroke(0xFFFFFFFF);
                 g.strokeWeight(2f);
-                g.noFill();
-                g.rect(sx - size / 2f - 2f, sy - size - 2f, size + 4f, size + 4f, 5);
-            }
-            g.noStroke();
+                // 占位动画②：受击闪白（Defender 的 hit flash 是纯表现）
+                int base = u.block() > 0 ? 0xFF2F6BDE : 0xFF8A5BE0;
+                g.fill(u.hitFlash() > 0f ? 0xFFFFFFFF : base);
+                g.rect(sx - size / 2f, sy - size, size, size, 4);
+                if (u.hitFlash() <= 0f && lunge > 0f) {
+                    // 出手瞬间描一圈亮边，替代"攻击动画"
+                    g.stroke(0xFFE8C15A, 200f * lunge);
+                    g.strokeWeight(2f);
+                    g.noFill();
+                    g.rect(sx - size / 2f - 2f, sy - size - 2f, size + 4f, size + 4f, 5);
+                }
+                g.noStroke();
 
-            // 朝向箭头
-            g.fill(0xFFFFFFFF);
-            float a = size * 0.42f;
-            float dx = u.facing().dx();
-            float dy = u.facing().dy();
-            g.triangle(sx + dx * a, sy - size / 2f + dy * a,
-                    sx + dx * a - dy * a * 0.7f, sy - size / 2f + dy * a + dx * a * 0.7f,
-                    sx + dx * a + dy * a * 0.7f, sy - size / 2f + dy * a - dx * a * 0.7f);
+                // 朝向箭头
+                g.fill(0xFFFFFFFF);
+                float a = size * 0.42f;
+                float dx = u.facing().dx();
+                float dy = u.facing().dy();
+                g.triangle(sx + dx * a, sy - size / 2f + dy * a,
+                        sx + dx * a - dy * a * 0.7f, sy - size / 2f + dy * a + dx * a * 0.7f,
+                        sx + dx * a + dy * a * 0.7f, sy - size / 2f + dy * a - dx * a * 0.7f);
+            }
 
             // 血条
             float w = size;
@@ -1428,13 +1715,29 @@ public final class BattleScreen {
         int line = 0;
         for (String txt : new String[]{
                 String.format("生命 %.0f / %.0f", panelEnemy.hp(), panelEnemy.maxHp()),
-                "攻 " + t.atk() + "   防 " + t.def() + "   法抗 " + t.res(),
                 String.format("速度 %.1f   间隔 %.1fs",
                         t.speed(), t.attackInterval()),
                 "阻挡权重 " + t.blockWeight()}) {
             g.text(txt, x + 18f, y + 82f + line * 22f);
             line++;
         }
+
+        // 防御/法抗：显示**被削减后的实际值**，与基础值不同时标红
+        // ⚠️ 必须用**战斗内时间**（减益存的是 scene.time()，从 0 起算）
+        float nowT = scene == null ? 0f : scene.time();
+        float defNow = t.def() * panelEnemy.defFactor(nowT);
+        float resNow = t.res() * panelEnemy.resFactor(nowT);
+        g.fill(0xFFC9D1DA);
+        g.text("攻 " + t.atk(), x + 18f, y + 82f + line * 22f);
+        float tx = x + 18f + g.textWidth("攻 " + t.atk() + "   ");
+        boolean defDown = defNow < t.def() - 0.01f;
+        g.fill(defDown ? 0xFFE05A5A : 0xFFC9D1DA);
+        g.text("防 " + Math.round(defNow), tx, y + 82f + line * 22f);
+        tx += g.textWidth("防 " + Math.round(defNow) + "   ");
+        boolean resDown = resNow < t.res() - 0.01f;
+        g.fill(resDown ? 0xFFE05A5A : 0xFFC9D1DA);
+        g.text("法抗 " + Math.round(resNow), tx, y + 82f + line * 22f);
+        line++;
 
         // 攻击范围：小方格示意（金色 = 覆盖）
         com.yestercar.runtime.battle.EnemyType.ensureRangesLoaded();
@@ -1551,9 +1854,16 @@ public final class BattleScreen {
                 break;
             }
         }
+        // 伤害类型以**实时**为准（特性可覆盖），图标与文字同步
+        com.yestercar.common.model.DamageType liveType =
+                director.damageTypeOfName(u.name());
+        if (liveType == null && opMeta != null) {
+            liveType = opMeta.damageType();
+        }
+        boolean isArts = liveType == com.yestercar.common.model.DamageType.ARTS;
         String[][] rows = {
                 {"生命值", String.format("%.0f/%.0f", u.hp(), u.maxHp())},
-                {"攻击力", String.valueOf(u.atk())},
+                {isArts ? "法术攻击力" : "攻击力", String.valueOf(u.atk())},
                 {"防御力", String.valueOf(u.def())},
                 {"法抗", String.valueOf(u.res())},
                 {"阻挡数", String.valueOf(u.block())},
@@ -1562,7 +1872,7 @@ public final class BattleScreen {
         };
         float rowY = y + 74f;
         for (String[] row : rows) {
-            processing.core.PImage ic = g.loadImage("data/imgs/人物属性/" + row[0] + ".png");
+            processing.core.PImage ic = g.loadImage(com.yestercar.common.util.AssetPaths.attributeIcon(row[0]));
             if (ic != null) {
                 g.imageMode(PConstants.CORNER);
                 g.image(ic, x + portraitW + 12f, rowY, 22f, 22f);
@@ -1719,6 +2029,58 @@ public final class BattleScreen {
     }
 
     /**
+     * 诊断：{@code -Dyestercar.ui.seqshotdir=<目录>} 在 {@code battleshotms} 之后
+     * 按固定间隔连续存帧，用来做"局内动画 GIF"。
+     *
+     * <p>为什么不复用 {@link #maybeBattleShot()}：那个只存一张。一张静帧无法区分
+     * "骨骼真的在动"和"色块占位"，必须沿时间轴取一串帧。
+     *
+     * <p>配合的属性：{@code yestercar.ui.seqshotcount}（默认 24 帧）、
+     * {@code yestercar.ui.seqshotinterval}（默认 50ms ≈ 20fps）。
+     */
+    private void maybeSequenceShot() {
+        String dir = System.getProperty("yestercar.ui.seqshotdir");
+        if (dir == null || dir.isBlank()) {
+            return;
+        }
+        String at = System.getProperty("yestercar.ui.battleshotms");
+        int startMs = at == null ? shotAtMs : Integer.parseInt(at);
+        int count = Integer.getInteger("yestercar.ui.seqshotcount", 24);
+        int interval = Integer.getInteger("yestercar.ui.seqshotinterval", 50);
+        if (seqShotIndex < 0) {
+            if (nowMs < startMs) {
+                return;
+            }
+            seqShotIndex = 0;
+            seqShotNextMs = nowMs;
+            System.out.printf("[诊断] 序列截图开始 %s 帧数=%d 间隔=%dms 模拟时刻=%.2fs%n",
+                    dir, count, interval, director == null ? -1f : director.time());
+        }
+        if (seqShotIndex >= count || nowMs < seqShotNextMs) {
+            return;
+        }
+        java.io.File out = new java.io.File(dir);
+        if (!out.isDirectory() && !out.mkdirs()) {
+            System.out.println("[诊断] 序列截图建不了目录: " + dir);
+            seqShotIndex = count;
+            return;
+        }
+        String frame = new java.io.File(out,
+                String.format(java.util.Locale.ROOT, "frame-%03d.png", seqShotIndex)).getPath();
+        g.saveFrame(frame);
+        seqShotIndex++;
+        seqShotNextMs = nowMs + interval;
+        if (seqShotIndex >= count) {
+            System.out.println("[诊断] 序列截图完成 " + count + " 帧 → " + dir
+                    + "  模拟时刻 " + String.format(java.util.Locale.ROOT, "%.2fs",
+                    director == null ? -1f : director.time()));
+            if ("1".equals(System.getProperty("yestercar.ui.shotexit"))) {
+                returnToMenu();
+            }
+        }
+    }
+
+    /**
      * 诊断：{@code -Dyestercar.ui.autoreturn=1} 结算后自动返回主菜单。
      *
      * <p>验证"战斗窗口隐藏 + 主菜单回到前台 + 能再次开战"这条链路。
@@ -1765,11 +2127,91 @@ public final class BattleScreen {
             if (cell == null) {
                 continue;
             }
-            String err = director.deploy(op, cell[0], cell[1],
-                    com.yestercar.common.util.Director.UP);
+            com.yestercar.common.util.Director facing = bestFacingFor(op, cell[0], cell[1]);
+            String err = director.deploy(op, cell[0], cell[1], facing);
             System.out.println("[诊断] 部署 " + op.name() + " @(" + cell[0] + "," + cell[1]
-                    + ") 朝向 上 → " + (err == null ? "成功" : err));
+                    + ") 朝向 " + facing + " → " + (err == null ? "成功" : err));
+            if (err == null) {
+                // 诊断：把刚部署干员的**屏幕脚底坐标**打出来，截图工具据此裁图
+                float[] q = new float[4];
+                camera.project(cell[0] + 0.5f, cell[1] + 0.5f, riseAt(cell[0], cell[1]), q);
+                System.out.println("[诊断] 屏幕坐标 " + op.id() + " = " + Math.round(q[0]) + ","
+                        + Math.round(q[1]) + " 格宽 " + Math.round(q[2]));
+            }
         }
+    }
+
+    /**
+     * 诊断：给自动部署挑一个朝向。
+     *
+     * <p>为什么需要：以前固定朝上，遇到"敌人沿横向通道过来"的地图，干员会站着不动
+     * （等于没演示到出手动画）。现在优先**朝最近的活着的敌人**；场上没有敌人时
+     * 退到"攻击范围覆盖最多敌人路径格"的朝向。
+     *
+     * @param op  干员
+     * @param col 部署列
+     * @param row 部署行
+     * @return 朝向
+     */
+    private com.yestercar.common.util.Director bestFacingFor(
+            com.yestercar.common.model.Operator op, int col, int row) {
+        com.yestercar.common.util.Director fallback = com.yestercar.common.util.Director.UP;
+        if (scene == null || scene.enemies().isEmpty()) {
+            return fallback;
+        }
+        // ① 有活着的敌人就朝最近的敌人：它会被挡在身前，正好落在射程里。
+        //    比"按路径覆盖打分"可靠 —— 路径格在流场里连通，四个朝向常常同分。
+        com.yestercar.runtime.battle.Enemy nearest = null;
+        int nearestDist = Integer.MAX_VALUE;
+        for (com.yestercar.runtime.battle.Enemy e : scene.enemies()) {
+            if (!e.alive()) {
+                continue;
+            }
+            int d = Math.abs(e.col() - col) + Math.abs(e.row() - row);
+            if (d < nearestDist) {
+                nearestDist = d;
+                nearest = e;
+            }
+        }
+        if (nearest != null) {
+            int dc = nearest.col() - col;
+            int dr = nearest.row() - row;
+            if (dc != 0 || dr != 0) {
+                if (Math.abs(dc) >= Math.abs(dr)) {
+                    return dc > 0 ? com.yestercar.common.util.Director.RIGHT
+                            : com.yestercar.common.util.Director.LEFT;
+                }
+                return dr > 0 ? com.yestercar.common.util.Director.DOWN
+                        : com.yestercar.common.util.Director.UP;
+            }
+        }
+        com.yestercar.runtime.pathfinding.FlowField f =
+                scene.fieldFor(scene.enemies().get(0).targetBlueDoorId());
+        if (f == null) {
+            return fallback;
+        }
+        com.yestercar.common.util.Director best = fallback;
+        int bestCount = -1;
+        float bestFlow = -1f;
+        for (com.yestercar.common.util.Director d : com.yestercar.common.util.Director.values()) {
+            int count = 0;
+            float flow = 0f;
+            for (com.yestercar.common.model.CellOffset off : op.rangeFor(d)) {
+                int c = col + off.dx();
+                int r = row + off.dy();
+                if (f.isReachable(c, r)) {
+                    count++;                // 敌人真的会走到这一格
+                    flow += f.distanceAt(c, r);   // 流场距离越大 = 越靠敌人上游
+                }
+            }
+            // 先比覆盖格数，再比"朝着敌人来向"（否则横向通道会挑到朝上）
+            if (count > bestCount || (count == bestCount && flow > bestFlow)) {
+                bestCount = count;
+                bestFlow = flow;
+                best = d;
+            }
+        }
+        return best;
     }
 
     /**
@@ -1994,7 +2436,12 @@ public final class BattleScreen {
         g.noStroke();
     }
 
-    /** 画一个敌人：地面上一个椭圆 + 头顶血条。 */
+    /**
+     * 画一个敌人：骨骼动画（有素材时）+ 头顶血条。
+     *
+     * <p>没有素材 / 解析失败时退回原来的色块占位（椭圆），
+     * 这样美术可以随时增量交付，不会挡住别人跑游戏。
+     */
     private void drawEnemy(Enemy e) {
         float[] base = new float[4];
         camera.project(e.x(), e.y(), 0.02f, base);
@@ -2004,29 +2451,115 @@ public final class BattleScreen {
         // 用"该处每格像素数"换算大小：近大远小是透视的自然结果，不用另写换算
         float size = PApplet.constrain(base[2] * ENEMY_RADIUS * 2f, 5f, 120f);
 
-        // 影子：让敌人看起来站在地上
+        // 影子：无论骨骼还是色块都先垫一层，让敌人看起来站在地上
         g.noStroke();
         g.fill(0, 0, 0, 70);
         g.ellipse(base[0], base[1], size * 1.1f, size * 0.5f);
 
-        // 身体：色块占位。
-        // ⚠️ data/imgs/enemy 的图**不是**作战贴图 —— 战斗中的敌人由合作方做骨骼动画，
-        //    那批图只用于编辑器选敌人、以及关卡信息里的"图标 + 数量"。
-        //    所以这里不画图，等骨骼接进来再换。
-        g.fill(UITheme.COLOR_ACCENT);
-        g.stroke(0xFFFFFFFF);
-        g.strokeWeight(1.5f);
-        g.ellipse(top[0], top[1], size, size);
-        g.noStroke();
+        com.yestercar.runtime.view.EnemyAnimator anim =
+                enemySpine == null ? null : enemySpine.at(e);
+        if (anim != null) {
+            // 骨骼绘制要走 PGraphics（PApplet 只是宿主，真正的画布是 g.getGraphics()），
+            // 和干员层同一条路径；受击染红用 0.45 的强度（敌人比干员挨打更频繁）。
+            float tint = 0f;
+            if (e.hp() < lastHpOf(e)) {
+                hitFlashUntil.put(e, System.currentTimeMillis() + 120);
+            }
+            Long until = hitFlashUntil.get(e);
+            if (until != null && until > System.currentTimeMillis()) {
+                tint = 0.45f;
+            }
+            g.pushMatrix();
+            g.resetMatrix();
+            g.hint(PConstants.DISABLE_DEPTH_TEST);
+            anim.draw(g.getGraphics(), base[0], base[1], base[2], tint);
+            g.hint(PConstants.ENABLE_DEPTH_TEST);
+            g.popMatrix();
+        } else {
+            // 身体：色块占位。
+            // ⚠️ data/imgs/enemy 的图**不是**作战贴图 —— 那批图只用于编辑器选敌人、
+            //    以及关卡信息里的"图标 + 数量"。所以这里不画图，素材缺失时才用它兜底。
+            g.fill(UITheme.COLOR_ACCENT);
+            g.stroke(0xFFFFFFFF);
+            g.strokeWeight(1.5f);
+            g.ellipse(top[0], top[1], size, size);
+            g.noStroke();
+        }
 
-        // 血条（满血也画，便于看出这是敌人）
+        // 血条（满血也画，便于看出这是敌人）；挂在"头顶上方"，跟着该处每格像素数走
         float hpRatio = e.maxHp() <= 0 ? 0f : (float) e.hp() / e.maxHp();
-        float barW = size * 1.2f;
-        float barY = top[1] - size * 0.8f;
+        float barW = Math.max(18f, base[2] * 0.5f);
+        float spriteH = anim != null
+                ? com.yestercar.runtime.view.EnemyAnimator.HEIGHT_TILES * base[2]
+                : size * 1.6f;
+        float barY = base[1] - spriteH - 8f;
         g.fill(0, 0, 0, 120);
-        g.rect(top[0] - barW / 2f, barY, barW, 4f);
+        g.rect(base[0] - barW / 2f, barY, barW, 4f);
         g.fill(0xFF4CD964);
-        g.rect(top[0] - barW / 2f, barY, barW * hpRatio, 4f);
+        g.rect(base[0] - barW / 2f, barY, barW * hpRatio, 4f);
+    }
+
+    /** 上一帧看到的每个敌人的血量（只用于"掉血 → 闪一下"的表现判断）。 */
+    private final java.util.Map<Enemy, Float> lastHp =
+            new java.util.IdentityHashMap<>();
+
+    /** 受击闪红截止时刻（毫秒）。 */
+    private final java.util.Map<Enemy, Long> hitFlashUntil =
+            new java.util.IdentityHashMap<>();
+
+    /**
+     * 清掉已经不在场上的敌人留下的表现状态（血量记录 / 闪红截止时刻）。
+     *
+     * <p>两张表都按对象身份存，敌人一死就再也不会被访问；不清理的话一整局会慢慢涨，
+     * 虽然量很小（每只几十字节），但这种"只增不减"的表在长局里迟早会被发现。
+     *
+     * @param alive 本帧场上的敌人
+     */
+    private void pruneEnemyFx(java.util.List<Enemy> alive) {
+        if (lastHp.isEmpty() && hitFlashUntil.isEmpty()) {
+            return;
+        }
+        java.util.Set<Enemy> keep =
+                java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
+        keep.addAll(alive);
+        lastHp.keySet().retainAll(keep);
+        hitFlashUntil.keySet().retainAll(keep);
+    }
+
+    /**
+     * @param e 敌人
+     * @return 上一帧的血量（第一次见到时返回当前血量，不会误触发闪红）
+     */
+    private float lastHpOf(Enemy e) {
+        Float prev = lastHp.get(e);
+        float now = e.hp();
+        if (prev == null) {
+            lastHp.put(e, now);
+            return now;
+        }
+        lastHp.put(e, now);
+        return prev;
+    }
+
+    /**
+     * 画一具敌人尸体：死亡动画续播 → 定格 → 淡出，配一圈扩散的尘土和淡出的影子。
+     *
+     * <p>引擎在敌人阵亡的当 tick 就把它从 {@code scene.enemies()} 里移走，
+     * 所以尸体只能靠表现层续播（动画器记着它最后一帧的世界坐标）。
+     * 具体画法在 {@link com.yestercar.runtime.view.EnemyAnimator#drawCorpse}，
+     * 与诊断工具 {@code EnemyDeathSheet} 共用同一段代码。
+     *
+     * @param anim 尸体动画器
+     */
+    private void drawEnemyCorpse(com.yestercar.runtime.view.EnemyAnimator anim) {
+        float[] p = new float[4];
+        camera.project(anim.worldX(), anim.worldY(), 0.02f, p);
+        g.pushMatrix();
+        g.resetMatrix();
+        g.hint(PConstants.DISABLE_DEPTH_TEST);
+        anim.drawCorpse(g.getGraphics(), p[0], p[1], p[2]);
+        g.hint(PConstants.ENABLE_DEPTH_TEST);
+        g.popMatrix();
     }
 
     /**
@@ -2317,6 +2850,7 @@ public final class BattleScreen {
         maybeAutoDeploy();
         maybeAutoReturn();
         maybeBattleShot();
+        maybeSequenceShot();
     }
 
     /**

@@ -1,0 +1,242 @@
+{
+  "traits": [
+    {
+      "operator": "myrtle",
+      "name": "浮光跃金",
+      "trigger": "on_deploy",
+      "duration": 7,
+      "dpPerSecond": 2,
+      "blockOverride": 0,
+      "description": "部署以后阻挡数变为0，并开始每秒回复2点费用，持续7秒。7秒后进入正常的待机状态。"
+    },
+    {
+      "operator": "bagpipe",
+      "name": "军事传统",
+      "trigger": "passive",
+      "dpPerKill": 2,
+      "refundRatio": 1.0,
+      "description": "每击败一名敌方单位回复两点费用，撤退时返还风笛全部初始部署费用"
+    },
+    {
+      "operator": "ines",
+      "name": "影织",
+      "trigger": "passive",
+      "dpPerAttack": 1,
+      "redeployTimeOverride": 15,
+      "description": "每攻击一次敌方单位回复一点费用，再部署时间缩短为15秒"
+    },
+    {
+      "operator": "texas",
+      "name": "战术快递",
+      "trigger": "passive",
+      "dpPerInterval": 5,
+      "interval": 5,
+      "description": "每隔5秒，自动回复5点部署费用"
+    },
+    {
+      "operator": "skadi",
+      "name": "深海掠食者",
+      "trigger": "passive",
+      "atkScale": 2.5,
+      "atkScaleDuration": 15,
+      "redeployTimeOverride": 20,
+      "description": "部署后15秒内攻击力提升150%，再部署时间缩短为20秒"
+    },
+    {
+      "operator": "surtr",
+      "name": "熔火",
+      "trigger": "passive",
+      "damageTypeOverride": "arts",
+      "resPierce": 30,
+      "undyingSeconds": 8,
+      "description": "攻击变成法术伤害，无视敌方30点法抗，血量清零后8秒内继续战斗"
+    },
+    {
+      "operator": "blaze",
+      "name": "紧急除颤",
+      "trigger": "passive",
+      "panicHeal": true,
+      "panicAtkScale": 2.0,
+      "description": "血量低于50%时，回复到满血状态，并且攻击力提升100%。每次部署只触发一次"
+    },
+    {
+      "operator": "chen",
+      "name": "形意洞照",
+      "trigger": "passive",
+      "damageFloorMaxHp": 0.05,
+      "description": "每次攻击对敌方造成的伤害取自己结算后攻击力或者敌方生命的5%两者中的最大值"
+    },
+    {
+      "operator": "mlynar",
+      "name": "未照耀的荣光",
+      "trigger": "passive",
+      "atkScale": 4.25,
+      "atkScaleDelay": 50,
+      "blockOverride": 4,
+      "blockDelay": 50,
+      "description": "部署50秒后，阻挡数变成4，攻击力提升325%"
+    },
+    {
+      "operator": "cuora",
+      "name": "壳状防御",
+      "trigger": "passive",
+      "defAura": 200,
+      "description": "周围相连四格的友方单位防御力+200"
+    },
+    {
+      "operator": "gumi",
+      "name": "备用军粮",
+      "trigger": "passive",
+      "healPerInterval": 1.0,
+      "interval": 5,
+      "description": "每隔五秒恢复周围八格一名友方干员古米100%攻击力的生命值"
+    },
+    {
+      "operator": "hoshiguma",
+      "name": "荆棘",
+      "trigger": "passive",
+      "reflectRatio": 0.5,
+      "description": "每次受到攻击，反弹给对方星熊50%攻击力的物理伤害"
+    },
+    {
+      "operator": "saria",
+      "name": "钙质化",
+      "trigger": "passive",
+      "damageTakenAmp": 0.5,
+      "description": "自身阻挡的敌方单位受到的全属性伤害增加50%"
+    },
+    {
+      "operator": "april",
+      "name": "熟练猎手",
+      "trigger": "passive",
+      "focusLowestDef": true,
+      "nthAttack": 3,
+      "nthAttackScale": 1.7,
+      "description": "优先攻击攻击范围内防御力最低的敌方单位，每3次攻击的下次攻击的攻击力提升70%，攻击后攻击力恢复至初始数值"
+    },
+    {
+      "operator": "kroos",
+      "name": "中的",
+      "trigger": "passive",
+      "critChance": 0.3,
+      "critScale": 2.0,
+      "description": "每次攻击时，有30%的概率使当次攻击的攻击力提升100%"
+    },
+    {
+      "operator": "exusiai",
+      "name": "火力电台",
+      "trigger": "passive",
+      "stackAtkPerHit": 0.2,
+      "stackAspdPerHit": 10,
+      "stackMax": 3,
+      "description": "攻击相同目标时，每次攻击提升自身攻击力20%，提升攻速10点，最多叠加3层"
+    },
+    {
+      "operator": "w",
+      "name": "设伏",
+      "trigger": "passive",
+      "defPierce": 300,
+      "atkScale": 1.5,
+      "atkScaleDuration": 10,
+      "defScale": 2.0,
+      "resBonus": 15,
+      "description": "攻击无视敌方300点防御力，部署后10秒防御力提升100%，获得15点法抗，攻击力提升50%"
+    },
+    {
+      "operator": "amiya",
+      "name": "情绪吸收",
+      "trigger": "passive",
+      "ignoreAllDefRes": true,
+      "teamAtkBonus": 0.18,
+      "description": "攻击无视敌方单位的防御力以及法抗。部署后，使全场我方单位的攻击力提升18%"
+    },
+    {
+      "operator": "dusk",
+      "name": "点睛",
+      "trigger": "passive",
+      "killStackAtk": 0.06,
+      "killStackMax": 18,
+      "description": "每击杀一名敌人，攻击力提升6%，最多可以叠加18层"
+    },
+    {
+      "operator": "eyjafjalla",
+      "name": "炎息",
+      "trigger": "passive",
+      "resPierce": 20,
+      "teamAtkBonus": 0.3,
+      "teamAtkBonusClass": "Caster",
+      "description": "无视敌方单位20点法术抗性。部署后，使所有我方术士攻击力提升30%"
+    },
+    {
+      "operator": "mostima",
+      "name": "主观缓时",
+      "trigger": "passive",
+      "slowAura": 0.7,
+      "description": "在场时，攻击范围内所有敌方单位移动速度减少30%"
+    },
+    {
+      "operator": "eyjafjalla_the_hvit_aska",
+      "name": "氤氲",
+      "trigger": "passive",
+      "healAuraPercent": 0.02,
+      "description": "攻击范围内的友方单位每秒回复2%生命"
+    },
+    {
+      "operator": "kaltsit",
+      "name": "遗尘守望",
+      "trigger": "passive",
+      "allyHpPct": 0.15,
+      "allyDefPct": 0.15,
+      "description": "攻击范围内友方单位生命值和防御加15%"
+    },
+    {
+      "operator": "reed",
+      "name": "灼痕映曜",
+      "trigger": "passive",
+      "noHeal": true,
+      "lifestealPercent": 0.5,
+      "damageTypeOverride": "arts",
+      "description": "不主动治疗友方单位，但可主动攻击敌方单位，对敌方单位造成伤害时，恢复攻击范围内友方焰影苇草50%攻击力的生命值"
+    },
+    {
+      "operator": "warfarin",
+      "name": "不稳定血浆",
+      "trigger": "passive",
+      "healAtkBuff": 0.5,
+      "healAtkBuffDuration": 5,
+      "description": "每次治疗友方单位时使被治疗的单位攻击力增加50%，持续5秒"
+    },
+    {
+      "operator": "shamare",
+      "name": "溃败暗示",
+      "trigger": "passive",
+      "defResShred": 0.3,
+      "shredDuration": 3,
+      "description": "攻击敌方单位时，使被攻击的单位防御力和法抗都减少30%，持续3秒，不可叠加层数"
+    },
+    {
+      "operator": "angelina",
+      "name": "漂浮大地之上",
+      "trigger": "passive",
+      "condExtraDamage": 0.5,
+      "condDefBelow": 500,
+      "condResBelow": 20,
+      "description": "安洁莉娜攻击防御力低于500，法术抗性低于20的敌方单位时额外造成50%的法术伤害"
+    },
+    {
+      "operator": "podenco",
+      "name": "孢子扩散",
+      "trigger": "passive",
+      "dotPercent": 0.5,
+      "dotDuration": 5,
+      "description": "每次攻击敌方单位会残留孢子，孢子每秒对敌方造成波登可的攻击力50%的法术伤害，持续5秒，不可叠加层数"
+    },
+    {
+      "operator": "suzuran",
+      "name": "画地为牢",
+      "trigger": "passive",
+      "damageTakenMul": 0.7,
+      "description": "攻击范围内，所有友方单位所受到的伤害减少至原来伤害的70%"
+    }
+  ]
+}

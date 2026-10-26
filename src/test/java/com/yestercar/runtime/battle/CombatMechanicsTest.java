@@ -120,9 +120,15 @@ class CombatMechanicsTest {
     }
 
     @Test
-    @DisplayName("幽灵攻击力为 0（不攻击）")
+    @DisplayName("幽灵：官方攻击力 100，但不可阻挡 → 近战永远没有目标，实际不攻击")
     void 幽灵不攻击() {
-        assertEquals(0, type("phantom").atk());
+        EnemyType ghost = type("phantom");
+        // PRTS「幽灵」级别0：攻击力 100、攻击方式=不攻击、无法被阻挡。
+        // 本工程没有"攻击方式"字段，靠"近战 + 阻挡权重 0（不可阻挡）"
+        // 让它在 enemiesAct 里永远拿不到目标 —— 行为与官方一致。
+        assertEquals(100, ghost.atk(), "官方攻击力 100");
+        assertEquals(0, ghost.blockWeight(), "不可阻挡 → 没有阻挡者可以打");
+        assertFalse(ghost.isRanged(), "近战 → 也不会主动找远程目标");
     }
 
     // ------------------------------------------------------------------

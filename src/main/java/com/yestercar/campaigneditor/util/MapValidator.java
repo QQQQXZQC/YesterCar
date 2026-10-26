@@ -31,18 +31,18 @@ import java.util.List;
  * <h2>规则来源</h2>
  * <ul>
  *   <li>至少一红一蓝、门数量上限、尺寸上限 —— 策划 §10.2.1</li>
- *   <li>红门最多 2 / 蓝门最多 2 —— 策划 §2.1</li>
+ *   <li>红门/蓝门数量不限（早期「各最多 2 道」的限制已取消）</li>
  *   <li>尺寸最大 {@value TileMap#MAX_SIZE}×{@value TileMap#MAX_SIZE}</li>
  *   <li>缺门/空图会被拒绝 —— 具体设计 §4.1.0.4</li>
  * </ul>
  */
 public final class MapValidator {
 
-    /** 红门数量上限（策划 §2.1）。 */
-    public static final int MAX_RED_DOORS = 2;
+    /** 红门数量**不再限制**（可任意多道）。 */
+    public static final int MAX_RED_DOORS = Integer.MAX_VALUE;
 
-    /** 蓝门数量上限（策划 §2.1）。 */
-    public static final int MAX_BLUE_DOORS = 2;
+    /** 蓝门数量**不再限制**（可任意多道）。 */
+    public static final int MAX_BLUE_DOORS = Integer.MAX_VALUE;
 
     private MapValidator() {
     }

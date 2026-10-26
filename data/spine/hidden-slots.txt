@@ -1,0 +1,8 @@
+# 按插槽名隐藏某些层（不动 .skel 素材）
+# 格式：<干员id> <插槽名>   （# 开头为注释）
+suzuran F_Face_Default_h
+suzuran F_Face_Default_i
+surtr F_Face_Default_h
+surtr F_Face_Default_i
+blaze F_Face_Default_4_2
+blaze F_Face_Default_3_2
